@@ -9,7 +9,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const BlindGenerator = () => {
-  const [width, setWidth] = useState(100); // mm
+  const [width, setWidth] = useState(500); // mm
   const [height, setHeight] = useState(2000); // mm
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
   const [slatDepth, setSlatDepth] = useState(20); // mm board depth
@@ -428,20 +428,20 @@ const BlindGenerator = () => {
                       value={width}
                       onChange={(e) => setWidth(Number(e.target.value))}
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={50}
+                      min={500}
                       max={1600}
                     />
                   </div>
                   <Slider
                     value={[width]}
                     onValueChange={(value) => setWidth(value[0])}
-                    min={50}
+                    min={500}
                     max={1600}
                     step={10}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>50mm</span>
+                    <span>500mm</span>
                     <span>1600mm</span>
                   </div>
                 </div>
