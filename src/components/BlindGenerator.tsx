@@ -123,6 +123,19 @@ const BlindGenerator = () => {
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
+    // Draw additional horizontal supports (every 610mm)
+    const additionalHorizontals = height > 610 ? Math.floor((height - 2 * slatDepth) / 610) : 0;
+    for (let i = 1; i <= additionalHorizontals; i++) {
+      const supportY = offsetY + scaledDepth + (i * 610 * scale);
+      const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
+      supportGradient.addColorStop(0, "hsl(199, 85%, 50%)");
+      supportGradient.addColorStop(1, "hsl(199, 75%, 40%)");
+      ctx.fillStyle = supportGradient;
+      ctx.fillRect(offsetX + scaledDepth, supportY, scaledWidth - 2 * scaledDepth, scaledDepth);
+      ctx.strokeStyle = "hsl(199, 89%, 48%)";
+      ctx.strokeRect(offsetX + scaledDepth, supportY, scaledWidth - 2 * scaledDepth, scaledDepth);
+    }
+
     // Draw dimension lines
     ctx.setLineDash([5, 5]);
     ctx.lineWidth = 1;
