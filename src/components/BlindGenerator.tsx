@@ -116,39 +116,9 @@ const BlindGenerator = () => {
   };
 
   const alignToNearestDivision = () => {
-    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
-    if (additionalHorizontals === 0) return;
-
-    const numDivisions = Math.floor(height / divisionSize);
-    const newPositions: Record<number, number> = {};
-
-    // Align all horizontal supports to nearest division marks
-    for (let i = 1; i <= additionalHorizontals; i++) {
-      // Get current position of this support
-      const currentPosition = customSupportPositions[i] !== undefined 
-        ? customSupportPositions[i] 
-        : (i * supportSpacing);
-
-      // Find nearest division mark
-      let nearestDivision = 0;
-      let minDistance = Infinity;
-
-      for (let j = 0; j <= numDivisions; j++) {
-        const divisionPosition = j * divisionSize;
-        const distance = Math.abs(currentPosition - divisionPosition);
-        
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestDivision = divisionPosition;
-        }
-      }
-
-      // Set position to nearest division
-      newPositions[i] = nearestDivision;
-    }
-
-    // Update all positions at once
-    setCustomSupportPositions(newPositions);
+    // Reset all supports to default spacing positions
+    setCustomSupportPositions({});
+    setSelectedSupport(null);
   };
 
   const drawBlinds = () => {
@@ -715,10 +685,10 @@ const BlindGenerator = () => {
                     onClick={alignToNearestDivision}
                     className="w-full"
                   >
-                    Выровнять все перекладины
+                    Выровнять по SUPPORT SPACING
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
-                    Выровнять все перекладины по меткам деления
+                    Вернуть все перекладины в исходные позиции
                   </p>
                 </div>
               </div>
