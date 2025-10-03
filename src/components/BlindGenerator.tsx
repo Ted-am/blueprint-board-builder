@@ -156,12 +156,12 @@ const BlindGenerator = () => {
                   <tbody>
                     <tr className="border-b border-border">
                       <td className="px-4 py-2 text-muted-foreground">Left</td>
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height}mm</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height - 2 * slatDepth}mm</td>
                       <td className="px-4 py-2 text-foreground">1</td>
                     </tr>
                     <tr className="border-b border-border">
                       <td className="px-4 py-2 text-muted-foreground">Right</td>
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height}mm</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height - 2 * slatDepth}mm</td>
                       <td className="px-4 py-2 text-foreground">1</td>
                     </tr>
                     <tr className="border-b border-border">
