@@ -13,13 +13,14 @@ const BlindGenerator = () => {
   const [height, setHeight] = useState(2000); // mm
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
   const [slatDepth, setSlatDepth] = useState(20); // mm board depth
+  const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const SLAT_GAP = 3; // mm gap between slats
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -40,8 +41,8 @@ const BlindGenerator = () => {
     const horizontalWidth = width - 2 * slatDepth;
     const horizontalHeight = slatWidth;
     
-    // Calculate additional horizontal boards needed (every 610mm)
-    const additionalHorizontals = height > 610 ? Math.floor((height - 2 * slatDepth) / 610) : 0;
+    // Calculate additional horizontal boards needed based on supportSpacing
+    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
     const tableData = [
       [verticalWidth, verticalHeight, slatDepth, 2],
@@ -123,10 +124,10 @@ const BlindGenerator = () => {
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
-    // Draw additional horizontal supports (every 610mm)
-    const additionalHorizontals = height > 610 ? Math.floor((height - 2 * slatDepth) / 610) : 0;
+    // Draw additional horizontal supports based on supportSpacing
+    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const supportY = offsetY + scaledDepth + (i * 610 * scale);
+      const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
       supportGradient.addColorStop(0, "hsl(199, 85%, 50%)");
       supportGradient.addColorStop(1, "hsl(199, 75%, 40%)");
@@ -144,9 +145,9 @@ const BlindGenerator = () => {
     
     const prevSupportY = offsetY + scaledDepth;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const currentSupportY = offsetY + scaledDepth + (i * 610 * scale);
+      const currentSupportY = offsetY + scaledDepth + (i * supportSpacing * scale);
       const arrowX = offsetX + scaledWidth + 30;
-      const startY = i === 1 ? prevSupportY : offsetY + scaledDepth + ((i - 1) * 610 * scale);
+      const startY = i === 1 ? prevSupportY : offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
       
       // Draw vertical line
       ctx.beginPath();
@@ -186,7 +187,7 @@ const BlindGenerator = () => {
       ctx.save();
       ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
       ctx.rotate(-Math.PI / 2);
-      ctx.fillText("610mm", 0, 0);
+      ctx.fillText(`${supportSpacing}mm`, 0, 0);
       ctx.restore();
     }
     
@@ -284,7 +285,7 @@ const BlindGenerator = () => {
                         <td className="px-4 py-2 text-foreground">{width - 2 * slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">{slatWidth}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">{2 + (height > 610 ? Math.floor((height - 2 * slatDepth) / 610) : 0)}</td>
+                        <td className="px-4 py-2 text-foreground">{2 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -426,6 +427,44 @@ const BlindGenerator = () => {
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>20mm</span>
                     <span>100mm</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-card border-border shadow-lg">
+              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                SUPPORT SPACING
+              </h2>
+
+              <div className="space-y-6">
+                {/* Support Spacing Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="supportSpacing" className="text-sm font-mono uppercase tracking-wider">
+                      Spacing (mm)
+                    </Label>
+                    <Input
+                      id="supportSpacing"
+                      type="number"
+                      value={supportSpacing}
+                      onChange={(e) => setSupportSpacing(Number(e.target.value))}
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+                      min={400}
+                      max={640}
+                    />
+                  </div>
+                  <Slider
+                    value={[supportSpacing]}
+                    onValueChange={(value) => setSupportSpacing(value[0])}
+                    min={400}
+                    max={640}
+                    step={10}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>400mm</span>
+                    <span>640mm</span>
                   </div>
                 </div>
               </div>
