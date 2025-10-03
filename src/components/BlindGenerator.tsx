@@ -131,12 +131,12 @@ const BlindGenerator = () => {
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8">
           {/* Canvas */}
-          <Card className="p-6 bg-card border-border shadow-lg">
+          <Card className="p-6 border-border shadow-lg bg-transparent">
             <canvas
               ref={canvasRef}
               width={800}
               height={600}
-              className="w-full h-auto border border-border rounded"
+              className="w-full h-auto border border-border rounded bg-transparent"
             />
             <div className="mt-4 text-sm text-muted-foreground font-mono">
               <div className="flex justify-between">
