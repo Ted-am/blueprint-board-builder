@@ -239,11 +239,11 @@ const BlindGenerator = () => {
     
     ctx.setLineDash([]);
 
-    // Draw 122mm division marks on left vertical side
-    const divisionSize = 122; // mm
+    // Draw 1220mm division marks inside the frame
+    const divisionSize = 1220; // mm
     const numDivisions = Math.floor(height / divisionSize);
     const scaledDivisionSize = divisionSize * scale;
-    const divisionArrowX = offsetX - 40;
+    const divisionArrowX = offsetX + scaledDepth + 30;
     
     ctx.setLineDash([]);
     ctx.lineWidth = 1;
@@ -254,10 +254,10 @@ const BlindGenerator = () => {
     for (let i = 0; i <= numDivisions; i++) {
       const divisionY = offsetY + (i * scaledDivisionSize);
       
-      // Draw horizontal tick mark
+      // Draw horizontal tick mark inside frame
       ctx.beginPath();
-      ctx.moveTo(offsetX, divisionY);
-      ctx.lineTo(divisionArrowX + 5, divisionY);
+      ctx.moveTo(offsetX + scaledDepth, divisionY);
+      ctx.lineTo(divisionArrowX - 5, divisionY);
       ctx.stroke();
       
       // Draw arrow and label for segments (not after the last tick)
@@ -299,9 +299,9 @@ const BlindGenerator = () => {
         ctx.shadowBlur = 15;
         
         ctx.save();
-        ctx.translate(divisionArrowX - 20, midY);
+        ctx.translate(divisionArrowX + 20, midY);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText("122", 0, 0);
+        ctx.fillText("1220", 0, 0);
         ctx.restore();
         
         ctx.fillStyle = "hsl(199, 89%, 48%)";
