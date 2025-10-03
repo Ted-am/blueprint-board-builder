@@ -16,8 +16,6 @@ const BlindGenerator = () => {
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const SLAT_GAP = 3; // mm gap between slats
-
   useEffect(() => {
     drawBlinds();
   }, [width, height, slatWidth, slatDepth, supportSpacing]);
@@ -298,7 +296,6 @@ const BlindGenerator = () => {
             <div className="mt-4 space-y-4">
               <div className="text-sm text-muted-foreground font-mono">
                 <div className="flex justify-between">
-                  <span>SLATS: {Math.floor(height / (slatWidth + SLAT_GAP))}</span>
                   <span>SCALE: AUTO</span>
                   <span>AREA: {((width * height) / 1000000).toFixed(2)}m²</span>
                 </div>
@@ -538,14 +535,6 @@ const BlindGenerator = () => {
                 <div className="flex justify-between border-b border-border pb-2">
                   <span className="text-muted-foreground">Board Depth:</span>
                   <span className="text-foreground">{slatDepth}mm</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Slat Gap:</span>
-                  <span className="text-foreground">3mm</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Total Slats:</span>
-                  <span className="text-foreground">{Math.floor(height / (slatWidth + SLAT_GAP))}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Material:</span>
