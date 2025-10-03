@@ -3,6 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const BlindGenerator = () => {
   const [width, setWidth] = useState(100); // mm
@@ -16,6 +20,33 @@ const BlindGenerator = () => {
   useEffect(() => {
     drawBlinds();
   }, [width, height, slatWidth, slatDepth]);
+
+  const downloadCutList = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Cut List - Wooden Blind", 14, 20);
+    
+    doc.setFontSize(12);
+    doc.text(`Frame: ${width}mm × ${height}mm`, 14, 30);
+    doc.text(`Board Depth: ${slatDepth}mm`, 14, 37);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 44);
+    
+    const tableData = [
+      [slatDepth, height - 2 * slatDepth, slatDepth, 2],
+      [width - 2 * slatDepth, slatDepth, slatDepth, 2],
+    ];
+    
+    autoTable(doc, {
+      startY: 50,
+      head: [["Width (mm)", "Height (mm)", "Depth (mm)", "Quantity"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: { fillColor: [41, 128, 185] },
+    });
+    
+    doc.save(`cutlist-${width}x${height}.pdf`);
+  };
 
   const drawBlinds = () => {
     const canvas = canvasRef.current;
@@ -144,25 +175,40 @@ const BlindGenerator = () => {
                 </div>
               </div>
               
-              <div className="border border-border rounded-lg overflow-hidden">
-                <table className="w-full text-sm font-mono">
-                  <thead>
-                    <tr className="bg-primary/10 border-b border-border">
-                      <th className="px-4 py-2 text-left text-foreground">Board Dimensions</th>
-                      <th className="px-4 py-2 text-left text-foreground">Quantity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-border">
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height - 2 * slatDepth}mm</td>
-                      <td className="px-4 py-2 text-foreground">2</td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width - 2 * slatDepth}mm</td>
-                      <td className="px-4 py-2 text-foreground">2</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">Board Dimensions</h3>
+                  <Button onClick={downloadCutList} size="sm" className="gap-2">
+                    <Download className="w-4 h-4" />
+                    Download CutList
+                  </Button>
+                </div>
+                <div className="border border-border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm font-mono">
+                    <thead>
+                      <tr className="bg-primary/10 border-b border-border">
+                        <th className="px-4 py-2 text-left text-foreground">Width (mm)</th>
+                        <th className="px-4 py-2 text-left text-foreground">Height (mm)</th>
+                        <th className="px-4 py-2 text-left text-foreground">Depth (mm)</th>
+                        <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-border">
+                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{height - 2 * slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">2</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-2 text-foreground">{width - 2 * slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">2</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </Card>
@@ -235,36 +281,6 @@ const BlindGenerator = () => {
                   </div>
                 </div>
 
-                {/* Slat Width Control */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="slatWidth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Width (mm)
-                    </Label>
-                    <Input
-                      id="slatWidth"
-                      type="number"
-                      value={slatWidth}
-                      onChange={(e) => setSlatWidth(Number(e.target.value))}
-                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={10}
-                      max={100}
-                    />
-                  </div>
-                  <Slider
-                    value={[slatWidth]}
-                    onValueChange={(value) => setSlatWidth(value[0])}
-                    min={10}
-                    max={100}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>10mm</span>
-                    <span>100mm</span>
-                  </div>
-                </div>
-
                 {/* Slat Depth Control */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -292,6 +308,44 @@ const BlindGenerator = () => {
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>1mm</span>
                     <span>20mm</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-card border-border shadow-lg">
+              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                BOARD WIDTH
+              </h2>
+
+              <div className="space-y-6">
+                {/* Slat Width Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="slatWidth" className="text-sm font-mono uppercase tracking-wider">
+                      Board Width (mm)
+                    </Label>
+                    <Input
+                      id="slatWidth"
+                      type="number"
+                      value={slatWidth}
+                      onChange={(e) => setSlatWidth(Number(e.target.value))}
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+                      min={10}
+                      max={100}
+                    />
+                  </div>
+                  <Slider
+                    value={[slatWidth]}
+                    onValueChange={(value) => setSlatWidth(value[0])}
+                    min={10}
+                    max={100}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>10mm</span>
+                    <span>100mm</span>
                   </div>
                 </div>
               </div>
