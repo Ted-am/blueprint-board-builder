@@ -12,7 +12,7 @@ const BlindGenerator = () => {
   const [width, setWidth] = useState(100); // mm
   const [height, setHeight] = useState(2000); // mm
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
-  const [slatDepth, setSlatDepth] = useState(3); // mm board depth
+  const [slatDepth, setSlatDepth] = useState(20); // mm board depth
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const SLAT_GAP = 3; // mm gap between slats
@@ -301,21 +301,21 @@ const BlindGenerator = () => {
                       value={slatDepth}
                       onChange={(e) => setSlatDepth(Number(e.target.value))}
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={1}
-                      max={20}
+                      min={16}
+                      max={25}
                     />
                   </div>
                   <Slider
                     value={[slatDepth]}
                     onValueChange={(value) => setSlatDepth(value[0])}
-                    min={1}
-                    max={20}
+                    min={16}
+                    max={25}
                     step={1}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>1mm</span>
-                    <span>20mm</span>
+                    <span>16mm</span>
+                    <span>25mm</span>
                   </div>
                 </div>
               </div>
