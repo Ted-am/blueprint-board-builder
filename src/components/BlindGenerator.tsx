@@ -166,7 +166,7 @@ const BlindGenerator = () => {
                       type="number"
                       value={width}
                       onChange={(e) => setWidth(Number(e.target.value))}
-                      className="w-24 h-8 text-center font-mono bg-input border-border"
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={50}
                       max={1600}
                     />
@@ -196,7 +196,7 @@ const BlindGenerator = () => {
                       type="number"
                       value={height}
                       onChange={(e) => setHeight(Number(e.target.value))}
-                      className="w-24 h-8 text-center font-mono bg-input border-border"
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={100}
                       max={4000}
                     />
@@ -226,7 +226,7 @@ const BlindGenerator = () => {
                       type="number"
                       value={slatWidth}
                       onChange={(e) => setSlatWidth(Number(e.target.value))}
-                      className="w-24 h-8 text-center font-mono bg-input border-border"
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={10}
                       max={100}
                     />
@@ -256,7 +256,7 @@ const BlindGenerator = () => {
                       type="number"
                       value={slatDepth}
                       onChange={(e) => setSlatDepth(Number(e.target.value))}
-                      className="w-24 h-8 text-center font-mono bg-input border-border"
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={1}
                       max={20}
                     />
