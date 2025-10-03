@@ -148,31 +148,18 @@ const BlindGenerator = () => {
                 <table className="w-full text-sm font-mono">
                   <thead>
                     <tr className="bg-primary/10 border-b border-border">
-                      <th className="px-4 py-2 text-left text-foreground">Side</th>
                       <th className="px-4 py-2 text-left text-foreground">Board Dimensions</th>
                       <th className="px-4 py-2 text-left text-foreground">Quantity</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b border-border">
-                      <td className="px-4 py-2 text-muted-foreground">Left</td>
                       <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height - 2 * slatDepth}mm</td>
-                      <td className="px-4 py-2 text-foreground">1</td>
-                    </tr>
-                    <tr className="border-b border-border">
-                      <td className="px-4 py-2 text-muted-foreground">Right</td>
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height - 2 * slatDepth}mm</td>
-                      <td className="px-4 py-2 text-foreground">1</td>
-                    </tr>
-                    <tr className="border-b border-border">
-                      <td className="px-4 py-2 text-muted-foreground">Top</td>
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width}mm</td>
-                      <td className="px-4 py-2 text-foreground">1</td>
+                      <td className="px-4 py-2 text-foreground">2</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 text-muted-foreground">Bottom</td>
                       <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width}mm</td>
-                      <td className="px-4 py-2 text-foreground">1</td>
+                      <td className="px-4 py-2 text-foreground">2</td>
                     </tr>
                   </tbody>
                 </table>
