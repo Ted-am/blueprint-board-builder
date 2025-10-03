@@ -16,11 +16,12 @@ const BlindGenerator = () => {
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
+  const [customSupportPositions, setCustomSupportPositions] = useState<Record<number, number>>({}); // custom Y positions for supports (in mm from top)
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, customSupportPositions]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -83,7 +84,10 @@ const BlindGenerator = () => {
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
+      const supportYPosition = customSupportPositions[i] !== undefined 
+        ? customSupportPositions[i] 
+        : (i * supportSpacing);
+      const supportY = offsetY + scaledDepth + (supportYPosition * scale);
       const supportX = offsetX + scaledDepth;
       const supportWidth = scaledWidth - 2 * scaledDepth;
       const supportHeight = scaledDepth;
@@ -103,6 +107,36 @@ const BlindGenerator = () => {
 
     // If no support was clicked, deselect
     setSelectedSupport(null);
+  };
+
+  const alignToNearestDivision = () => {
+    if (selectedSupport === null) return;
+
+    // Get current position of selected support
+    const currentPosition = customSupportPositions[selectedSupport] !== undefined 
+      ? customSupportPositions[selectedSupport] 
+      : (selectedSupport * supportSpacing);
+
+    // Find nearest division mark
+    const numDivisions = Math.floor(height / divisionSize);
+    let nearestDivision = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i <= numDivisions; i++) {
+      const divisionPosition = i * divisionSize;
+      const distance = Math.abs(currentPosition - divisionPosition);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestDivision = divisionPosition;
+      }
+    }
+
+    // Update position to nearest division (center of support on division line)
+    setCustomSupportPositions({
+      ...customSupportPositions,
+      [selectedSupport]: nearestDivision
+    });
   };
 
   const drawBlinds = () => {
@@ -172,7 +206,11 @@ const BlindGenerator = () => {
     // Draw additional horizontal supports based on supportSpacing
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
+      // Use custom position if set, otherwise use default spacing
+      const supportYPosition = customSupportPositions[i] !== undefined 
+        ? customSupportPositions[i] 
+        : (i * supportSpacing);
+      const supportY = offsetY + scaledDepth + (supportYPosition * scale);
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
       
       // Highlight selected support
@@ -636,6 +674,25 @@ const BlindGenerator = () => {
                     <span>400mm</span>
                     <span>640mm</span>
                   </div>
+                </div>
+
+                {/* Align to Division Button */}
+                <div className="pt-4 border-t border-border">
+                  <Button
+                    onClick={alignToNearestDivision}
+                    disabled={selectedSupport === null}
+                    className="w-full"
+                    variant={selectedSupport !== null ? "default" : "outline"}
+                  >
+                    {selectedSupport !== null 
+                      ? `Выровнять перекладину #${selectedSupport}` 
+                      : "Выберите перекладину"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
+                    {selectedSupport !== null 
+                      ? "Выровнять по ближайшей метке деления"
+                      : "Кликните на перекладину для выбора"}
+                  </p>
                 </div>
               </div>
             </Card>
