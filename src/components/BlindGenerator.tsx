@@ -34,11 +34,11 @@ const BlindGenerator = () => {
     
     // Vertical boards - rotate so longer side is width
     const verticalWidth = height - 2 * slatDepth;
-    const verticalHeight = slatDepth;
+    const verticalHeight = slatWidth;
     
     // Horizontal boards - rotate so longer side is width
     const horizontalWidth = width - 2 * slatDepth;
-    const horizontalHeight = slatDepth;
+    const horizontalHeight = slatWidth;
     
     const tableData = [
       [verticalWidth, verticalHeight, slatDepth, 2],
@@ -204,13 +204,13 @@ const BlindGenerator = () => {
                     <tbody>
                       <tr className="border-b border-border">
                         <td className="px-4 py-2 text-foreground">{height - 2 * slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{slatWidth}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">2</td>
                       </tr>
                       <tr>
                         <td className="px-4 py-2 text-foreground">{width - 2 * slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{slatWidth}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">2</td>
                       </tr>
@@ -323,7 +323,7 @@ const BlindGenerator = () => {
 
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                BOARD WIDTH
+                BOARD HEIGHT
               </h2>
 
               <div className="space-y-6">
@@ -331,7 +331,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="slatWidth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Width (mm)
+                      Board Height (mm)
                     </Label>
                     <Input
                       id="slatWidth"
@@ -373,7 +373,7 @@ const BlindGenerator = () => {
                   <span className="text-foreground">{height}mm</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Board Width:</span>
+                  <span className="text-muted-foreground">Board Height:</span>
                   <span className="text-foreground">{slatWidth}mm</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
