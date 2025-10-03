@@ -135,11 +135,47 @@ const BlindGenerator = () => {
               height={600}
               className="w-full h-auto border border-border rounded bg-transparent"
             />
-            <div className="mt-4 text-sm text-muted-foreground font-mono">
-              <div className="flex justify-between">
-                <span>SLATS: {Math.floor(height / (slatWidth + SLAT_GAP))}</span>
-                <span>SCALE: AUTO</span>
-                <span>AREA: {((width * height) / 1000000).toFixed(2)}m²</span>
+            <div className="mt-4 space-y-4">
+              <div className="text-sm text-muted-foreground font-mono">
+                <div className="flex justify-between">
+                  <span>SLATS: {Math.floor(height / (slatWidth + SLAT_GAP))}</span>
+                  <span>SCALE: AUTO</span>
+                  <span>AREA: {((width * height) / 1000000).toFixed(2)}m²</span>
+                </div>
+              </div>
+              
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-sm font-mono">
+                  <thead>
+                    <tr className="bg-primary/10 border-b border-border">
+                      <th className="px-4 py-2 text-left text-foreground">Side</th>
+                      <th className="px-4 py-2 text-left text-foreground">Board Dimensions</th>
+                      <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="px-4 py-2 text-muted-foreground">Left</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height}mm</td>
+                      <td className="px-4 py-2 text-foreground">1</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="px-4 py-2 text-muted-foreground">Right</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {height}mm</td>
+                      <td className="px-4 py-2 text-foreground">1</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="px-4 py-2 text-muted-foreground">Top</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width}mm</td>
+                      <td className="px-4 py-2 text-foreground">1</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-2 text-muted-foreground">Bottom</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width}mm</td>
+                      <td className="px-4 py-2 text-foreground">1</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </Card>
