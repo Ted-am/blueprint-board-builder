@@ -116,33 +116,39 @@ const BlindGenerator = () => {
   };
 
   const alignToNearestDivision = () => {
-    if (selectedSupport === null) return;
+    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    if (additionalHorizontals === 0) return;
 
-    // Get current position of selected support
-    const currentPosition = customSupportPositions[selectedSupport] !== undefined 
-      ? customSupportPositions[selectedSupport] 
-      : (selectedSupport * supportSpacing);
-
-    // Find nearest division mark
     const numDivisions = Math.floor(height / divisionSize);
-    let nearestDivision = 0;
-    let minDistance = Infinity;
+    const newPositions: Record<number, number> = {};
 
-    for (let i = 0; i <= numDivisions; i++) {
-      const divisionPosition = i * divisionSize;
-      const distance = Math.abs(currentPosition - divisionPosition);
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestDivision = divisionPosition;
+    // Align all horizontal supports to nearest division marks
+    for (let i = 1; i <= additionalHorizontals; i++) {
+      // Get current position of this support
+      const currentPosition = customSupportPositions[i] !== undefined 
+        ? customSupportPositions[i] 
+        : (i * supportSpacing);
+
+      // Find nearest division mark
+      let nearestDivision = 0;
+      let minDistance = Infinity;
+
+      for (let j = 0; j <= numDivisions; j++) {
+        const divisionPosition = j * divisionSize;
+        const distance = Math.abs(currentPosition - divisionPosition);
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestDivision = divisionPosition;
+        }
       }
+
+      // Set position to nearest division
+      newPositions[i] = nearestDivision;
     }
 
-    // Update position to nearest division (center of support on division line)
-    setCustomSupportPositions({
-      ...customSupportPositions,
-      [selectedSupport]: nearestDivision
-    });
+    // Update all positions at once
+    setCustomSupportPositions(newPositions);
   };
 
   const drawBlinds = () => {
@@ -707,18 +713,12 @@ const BlindGenerator = () => {
                 <div className="pt-4 border-t border-border">
                   <Button
                     onClick={alignToNearestDivision}
-                    disabled={selectedSupport === null}
                     className="w-full"
-                    variant={selectedSupport !== null ? "default" : "outline"}
                   >
-                    {selectedSupport !== null 
-                      ? `Выровнять перекладину #${selectedSupport}` 
-                      : "Выберите перекладину"}
+                    Выровнять все перекладины
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
-                    {selectedSupport !== null 
-                      ? "Выровнять по ближайшей метке деления"
-                      : "Кликните на перекладину для выбора"}
+                    Выровнять все перекладины по меткам деления
                   </p>
                 </div>
               </div>
