@@ -677,34 +677,6 @@ const BlindGenerator = () => {
                 </div>
               </div>
             </Card>
-
-            <Card className="p-6 bg-card border-border shadow-lg">
-              <h2 className="text-xl font-semibold mb-4 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                SPECIFICATIONS
-              </h2>
-              <div className="space-y-2 text-sm font-mono">
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Frame Width:</span>
-                  <span className="text-foreground">{width}mm</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Frame Height:</span>
-                  <span className="text-foreground">{height}mm</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Board Height:</span>
-                  <span className="text-foreground">{slatWidth}mm</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Board Depth:</span>
-                  <span className="text-foreground">{slatDepth}mm</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Material:</span>
-                  <span className="text-foreground">Wood</span>
-                </div>
-              </div>
-            </Card>
           </div>
         </div>
       </div>
