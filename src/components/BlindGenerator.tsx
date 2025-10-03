@@ -14,12 +14,13 @@ const BlindGenerator = () => {
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
   const [slatDepth, setSlatDepth] = useState(20); // mm board depth
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
+  const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -294,8 +295,7 @@ const BlindGenerator = () => {
     
     ctx.setLineDash([]);
 
-    // Draw 1220mm division marks inside the frame
-    const divisionSize = 1220; // mm
+    // Draw division marks inside the frame
     const numDivisions = Math.floor(height / divisionSize);
     const scaledDivisionSize = divisionSize * scale;
     const divisionArrowX = offsetX + scaledDepth + 30;
@@ -356,7 +356,7 @@ const BlindGenerator = () => {
         ctx.save();
         ctx.translate(divisionArrowX + 20, midY);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText("1220", 0, 0);
+        ctx.fillText(String(divisionSize), 0, 0);
         ctx.restore();
         
         ctx.fillStyle = "hsl(199, 89%, 48%)";
@@ -635,6 +635,44 @@ const BlindGenerator = () => {
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>400mm</span>
                     <span>640mm</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-card border-border shadow-lg">
+              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                INTERNAL DIVISIONS
+              </h2>
+
+              <div className="space-y-6">
+                {/* Division Size Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="divisionSize" className="text-sm font-mono uppercase tracking-wider">
+                      Division Size (mm)
+                    </Label>
+                    <Input
+                      id="divisionSize"
+                      type="number"
+                      value={divisionSize}
+                      onChange={(e) => setDivisionSize(Number(e.target.value))}
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+                      min={60}
+                      max={2440}
+                    />
+                  </div>
+                  <Slider
+                    value={[divisionSize]}
+                    onValueChange={(value) => setDivisionSize(value[0])}
+                    min={60}
+                    max={2440}
+                    step={10}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>60mm</span>
+                    <span>2440mm</span>
                   </div>
                 </div>
               </div>
