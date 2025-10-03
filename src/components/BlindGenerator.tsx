@@ -32,9 +32,17 @@ const BlindGenerator = () => {
     doc.text(`Board Depth: ${slatDepth}mm`, 14, 37);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 44);
     
+    // Vertical boards - rotate so longer side is width
+    const verticalWidth = height - 2 * slatDepth;
+    const verticalHeight = slatDepth;
+    
+    // Horizontal boards - rotate so longer side is width
+    const horizontalWidth = width - 2 * slatDepth;
+    const horizontalHeight = slatDepth;
+    
     const tableData = [
-      [slatDepth, height - 2 * slatDepth, slatDepth, 2],
-      [width - 2 * slatDepth, slatDepth, slatDepth, 2],
+      [verticalWidth, verticalHeight, slatDepth, 2],
+      [horizontalWidth, horizontalHeight, slatDepth, 2],
     ];
     
     autoTable(doc, {
@@ -195,8 +203,8 @@ const BlindGenerator = () => {
                     </thead>
                     <tbody>
                       <tr className="border-b border-border">
-                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">{height - 2 * slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">2</td>
                       </tr>
