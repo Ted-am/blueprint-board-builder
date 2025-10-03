@@ -120,19 +120,28 @@ const BlindGenerator = () => {
 
     ctx.shadowBlur = 0;
 
-    // Draw slats
+    // Calculate inner area (inside the frame)
+    const innerOffsetX = offsetX + scaledDepth;
+    const innerOffsetY = offsetY + scaledDepth;
+    const innerWidth = scaledWidth - 2 * scaledDepth;
+    const innerHeight = scaledHeight - 2 * scaledDepth;
+
+    // Draw slats inside the frame
     for (let i = 0; i < numSlats; i++) {
-      const y = offsetY + i * (scaledSlatHeight + scaledSlatGap);
+      const y = innerOffsetY + i * (scaledSlatHeight + scaledSlatGap);
+      
+      // Skip if slat goes outside inner frame
+      if (y + scaledSlatHeight > innerOffsetY + innerHeight) break;
 
       // Wood gradient
-      const gradient = ctx.createLinearGradient(offsetX, y, offsetX, y + scaledSlatHeight);
+      const gradient = ctx.createLinearGradient(innerOffsetX, y, innerOffsetX, y + scaledSlatHeight);
       gradient.addColorStop(0, "hsl(30, 45%, 45%)");
       gradient.addColorStop(0.3, "hsl(30, 40%, 35%)");
       gradient.addColorStop(0.7, "hsl(30, 40%, 35%)");
       gradient.addColorStop(1, "hsl(30, 35%, 25%)");
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(offsetX, y, scaledWidth, scaledSlatHeight);
+      ctx.fillRect(innerOffsetX, y, innerWidth, scaledSlatHeight);
 
       // Wood grain texture
       ctx.strokeStyle = "hsl(30, 30%, 30%)";
@@ -141,8 +150,8 @@ const BlindGenerator = () => {
       
       for (let j = 0; j < 3; j++) {
         ctx.beginPath();
-        ctx.moveTo(offsetX, y + (j + 1) * (scaledSlatHeight / 4));
-        ctx.lineTo(offsetX + scaledWidth, y + (j + 1) * (scaledSlatHeight / 4));
+        ctx.moveTo(innerOffsetX, y + (j + 1) * (scaledSlatHeight / 4));
+        ctx.lineTo(innerOffsetX + innerWidth, y + (j + 1) * (scaledSlatHeight / 4));
         ctx.stroke();
       }
       
@@ -151,7 +160,7 @@ const BlindGenerator = () => {
       // Slat border
       ctx.strokeStyle = "hsl(30, 30%, 20%)";
       ctx.lineWidth = 1;
-      ctx.strokeRect(offsetX, y, scaledWidth, scaledSlatHeight);
+      ctx.strokeRect(innerOffsetX, y, innerWidth, scaledSlatHeight);
     }
   };
 
