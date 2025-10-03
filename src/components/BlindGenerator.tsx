@@ -40,12 +40,12 @@ const BlindGenerator = () => {
     const horizontalWidth = width - 2 * slatDepth;
     const horizontalHeight = slatWidth;
     
-    // Calculate additional vertical boards needed (height / 610)
-    const additionalVerticals = Math.floor(height / 610);
+    // Calculate additional horizontal boards needed (every 610mm)
+    const additionalHorizontals = height > 610 ? Math.floor((height - 2 * slatDepth) / 610) : 0;
     
     const tableData = [
-      [verticalWidth, verticalHeight, slatDepth, 2 + additionalVerticals],
-      [horizontalWidth, horizontalHeight, slatDepth, 2],
+      [verticalWidth, verticalHeight, slatDepth, 2],
+      [horizontalWidth, horizontalHeight, slatDepth, 2 + additionalHorizontals],
     ];
     
     autoTable(doc, {
@@ -209,13 +209,13 @@ const BlindGenerator = () => {
                         <td className="px-4 py-2 text-foreground">{height - 2 * slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">{slatWidth}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">{2 + Math.floor(height / 610)}</td>
+                        <td className="px-4 py-2 text-foreground">2</td>
                       </tr>
                       <tr>
                         <td className="px-4 py-2 text-foreground">{width - 2 * slatDepth}</td>
                         <td className="px-4 py-2 text-foreground">{slatWidth}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">2</td>
+                        <td className="px-4 py-2 text-foreground">{2 + (height > 610 ? Math.floor((height - 2 * slatDepth) / 610) : 0)}</td>
                       </tr>
                     </tbody>
                   </table>
