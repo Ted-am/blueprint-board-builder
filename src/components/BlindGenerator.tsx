@@ -339,20 +339,20 @@ const BlindGenerator = () => {
                       value={slatWidth}
                       onChange={(e) => setSlatWidth(Number(e.target.value))}
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={10}
+                      min={20}
                       max={100}
                     />
                   </div>
                   <Slider
                     value={[slatWidth]}
                     onValueChange={(value) => setSlatWidth(value[0])}
-                    min={10}
+                    min={20}
                     max={100}
                     step={1}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>10mm</span>
+                    <span>20mm</span>
                     <span>100mm</span>
                   </div>
                 </div>
