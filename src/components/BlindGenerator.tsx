@@ -38,21 +38,12 @@ const BlindGenerator = () => {
     const offsetX = (canvas.width - scaledWidth) / 2;
     const offsetY = (canvas.height - scaledHeight) / 2;
 
-    // Draw frame with background
-    ctx.fillStyle = "hsl(220, 15%, 12%)";
-    ctx.fillRect(offsetX, offsetY, scaledWidth, scaledHeight);
-    
+    // Draw frame (outline only)
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.lineWidth = 3;
     ctx.shadowColor = "hsl(199, 89%, 48%)";
     ctx.shadowBlur = 15;
     ctx.strokeRect(offsetX, offsetY, scaledWidth, scaledHeight);
-    
-    // Inner frame shadow
-    ctx.strokeStyle = "hsl(199, 89%, 68%)";
-    ctx.lineWidth = 1;
-    ctx.shadowBlur = 8;
-    ctx.strokeRect(offsetX + 2, offsetY + 2, scaledWidth - 4, scaledHeight - 4);
 
     // Draw dimension lines
     ctx.setLineDash([5, 5]);
