@@ -14,11 +14,12 @@ const BlindGenerator = () => {
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
   const [slatDepth, setSlatDepth] = useState(20); // mm board depth
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
+  const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -56,6 +57,51 @@ const BlindGenerator = () => {
     });
     
     doc.save(`cutlist-${width}x${height}.pdf`);
+  };
+
+  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
+
+    // Calculate scale and offsets (same as in drawBlinds)
+    const scale = Math.min(
+      (canvas.width - 80) / width,
+      (canvas.height - 80) / height
+    );
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
+    const offsetX = (canvas.width - scaledWidth) / 2;
+    const offsetY = (canvas.height - scaledHeight) / 2;
+    const scaledDepth = slatDepth * scale;
+
+    // Check if click is on any horizontal support
+    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    
+    for (let i = 1; i <= additionalHorizontals; i++) {
+      const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
+      const supportX = offsetX + scaledDepth;
+      const supportWidth = scaledWidth - 2 * scaledDepth;
+      const supportHeight = scaledDepth;
+
+      // Check if click is within this support's bounds
+      if (
+        clickX >= supportX &&
+        clickX <= supportX + supportWidth &&
+        clickY >= supportY &&
+        clickY <= supportY + supportHeight
+      ) {
+        // Toggle selection: if already selected, deselect; otherwise select
+        setSelectedSupport(selectedSupport === i ? null : i);
+        return;
+      }
+    }
+
+    // If no support was clicked, deselect
+    setSelectedSupport(null);
   };
 
   const drawBlinds = () => {
@@ -127,11 +173,20 @@ const BlindGenerator = () => {
     for (let i = 1; i <= additionalHorizontals; i++) {
       const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
-      supportGradient.addColorStop(0, "hsl(199, 85%, 50%)");
-      supportGradient.addColorStop(1, "hsl(199, 75%, 40%)");
+      
+      // Highlight selected support
+      if (selectedSupport === i) {
+        supportGradient.addColorStop(0, "hsl(45, 100%, 60%)"); // Bright yellow/gold
+        supportGradient.addColorStop(1, "hsl(45, 100%, 50%)");
+      } else {
+        supportGradient.addColorStop(0, "hsl(199, 85%, 50%)");
+        supportGradient.addColorStop(1, "hsl(199, 75%, 40%)");
+      }
+      
       ctx.fillStyle = supportGradient;
       ctx.fillRect(offsetX + scaledDepth, supportY, scaledWidth - 2 * scaledDepth, scaledDepth);
-      ctx.strokeStyle = "hsl(199, 89%, 48%)";
+      ctx.strokeStyle = selectedSupport === i ? "hsl(45, 100%, 70%)" : "hsl(199, 89%, 48%)";
+      ctx.lineWidth = selectedSupport === i ? 3 : 2;
       ctx.strokeRect(offsetX + scaledDepth, supportY, scaledWidth - 2 * scaledDepth, scaledDepth);
     }
 
@@ -360,7 +415,8 @@ const BlindGenerator = () => {
               ref={canvasRef}
               width={800}
               height={600}
-              className="w-full h-auto border border-border rounded bg-transparent"
+              className="w-full h-auto border border-border rounded bg-transparent cursor-pointer"
+              onClick={handleCanvasClick}
             />
             <div className="mt-4 space-y-4">
               <div className="text-sm text-muted-foreground font-mono">
