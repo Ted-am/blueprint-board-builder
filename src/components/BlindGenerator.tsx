@@ -191,6 +191,54 @@ const BlindGenerator = () => {
       ctx.restore();
     }
     
+    // Draw dimension arrow for the last segment (from last support to bottom)
+    if (additionalHorizontals > 0) {
+      const lastSupportY = offsetY + scaledDepth + (additionalHorizontals * supportSpacing * scale);
+      const bottomY = offsetY + scaledHeight - scaledDepth;
+      const lastSegmentDistance = height - scaledDepth / scale - (additionalHorizontals * supportSpacing) - slatDepth;
+      const arrowX = offsetX + scaledWidth + 30;
+      
+      // Draw vertical line
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(arrowX, lastSupportY);
+      ctx.lineTo(arrowX, bottomY);
+      ctx.stroke();
+      
+      // Draw arrows
+      const arrowSize = 8;
+      ctx.setLineDash([]);
+      ctx.fillStyle = "hsl(199, 89%, 48%)";
+      
+      // Top arrow
+      ctx.beginPath();
+      ctx.moveTo(arrowX, lastSupportY);
+      ctx.lineTo(arrowX - arrowSize / 2, lastSupportY + arrowSize);
+      ctx.lineTo(arrowX + arrowSize / 2, lastSupportY + arrowSize);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Bottom arrow
+      ctx.beginPath();
+      ctx.moveTo(arrowX, bottomY);
+      ctx.lineTo(arrowX - arrowSize / 2, bottomY - arrowSize);
+      ctx.lineTo(arrowX + arrowSize / 2, bottomY - arrowSize);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Draw dimension text
+      ctx.fillStyle = "hsl(0, 0%, 100%)";
+      ctx.font = "12px monospace";
+      ctx.textAlign = "center";
+      ctx.shadowBlur = 15;
+      
+      ctx.save();
+      ctx.translate(arrowX + 25, (lastSupportY + bottomY) / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(`${Math.round(lastSegmentDistance)}mm`, 0, 0);
+      ctx.restore();
+    }
+    
     ctx.setLineDash([]);
 
     // Draw dimension lines
