@@ -158,7 +158,7 @@ const BlindGenerator = () => {
                       <td className="px-4 py-2 text-foreground">2</td>
                     </tr>
                     <tr>
-                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width}mm</td>
+                      <td className="px-4 py-2 text-foreground">{slatDepth}mm × {width - 2 * slatDepth}mm</td>
                       <td className="px-4 py-2 text-foreground">2</td>
                     </tr>
                   </tbody>
