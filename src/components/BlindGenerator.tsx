@@ -6,15 +6,16 @@ import { Input } from "@/components/ui/input";
 
 const BlindGenerator = () => {
   const [width, setWidth] = useState(100); // mm
-  const [height, setHeight] = useState(4000); // mm
+  const [height, setHeight] = useState(2000); // mm
+  const [slatWidth, setSlatWidth] = useState(25); // mm board width
+  const [slatDepth, setSlatDepth] = useState(3); // mm board depth
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const SLAT_HEIGHT = 25; // mm per slat
   const SLAT_GAP = 3; // mm gap between slats
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height]);
+  }, [width, height, slatWidth, slatDepth]);
 
   const drawBlinds = () => {
     const canvas = canvasRef.current;
@@ -77,8 +78,8 @@ const BlindGenerator = () => {
     ctx.restore();
 
     // Calculate number of slats
-    const numSlats = Math.floor(height / (SLAT_HEIGHT + SLAT_GAP));
-    const scaledSlatHeight = SLAT_HEIGHT * scale;
+    const numSlats = Math.floor(height / (slatWidth + SLAT_GAP));
+    const scaledSlatHeight = slatWidth * scale;
     const scaledSlatGap = SLAT_GAP * scale;
 
     ctx.shadowBlur = 0;
@@ -139,7 +140,7 @@ const BlindGenerator = () => {
             />
             <div className="mt-4 text-sm text-muted-foreground font-mono">
               <div className="flex justify-between">
-                <span>SLATS: {Math.floor(height / 28)}</span>
+                <span>SLATS: {Math.floor(height / (slatWidth + SLAT_GAP))}</span>
                 <span>SCALE: AUTO</span>
                 <span>AREA: {((width * height) / 1000000).toFixed(2)}m²</span>
               </div>
@@ -167,20 +168,20 @@ const BlindGenerator = () => {
                       onChange={(e) => setWidth(Number(e.target.value))}
                       className="w-24 h-8 text-center font-mono bg-input border-border"
                       min={50}
-                      max={5000}
+                      max={1600}
                     />
                   </div>
                   <Slider
                     value={[width]}
                     onValueChange={(value) => setWidth(value[0])}
                     min={50}
-                    max={5000}
+                    max={1600}
                     step={10}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>50mm</span>
-                    <span>5000mm</span>
+                    <span>1600mm</span>
                   </div>
                 </div>
 
@@ -197,20 +198,80 @@ const BlindGenerator = () => {
                       onChange={(e) => setHeight(Number(e.target.value))}
                       className="w-24 h-8 text-center font-mono bg-input border-border"
                       min={100}
-                      max={8000}
+                      max={4000}
                     />
                   </div>
                   <Slider
                     value={[height]}
                     onValueChange={(value) => setHeight(value[0])}
                     min={100}
-                    max={8000}
+                    max={4000}
                     step={10}
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>100mm</span>
-                    <span>8000mm</span>
+                    <span>4000mm</span>
+                  </div>
+                </div>
+
+                {/* Slat Width Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="slatWidth" className="text-sm font-mono uppercase tracking-wider">
+                      Board Width (mm)
+                    </Label>
+                    <Input
+                      id="slatWidth"
+                      type="number"
+                      value={slatWidth}
+                      onChange={(e) => setSlatWidth(Number(e.target.value))}
+                      className="w-24 h-8 text-center font-mono bg-input border-border"
+                      min={10}
+                      max={100}
+                    />
+                  </div>
+                  <Slider
+                    value={[slatWidth]}
+                    onValueChange={(value) => setSlatWidth(value[0])}
+                    min={10}
+                    max={100}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>10mm</span>
+                    <span>100mm</span>
+                  </div>
+                </div>
+
+                {/* Slat Depth Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="slatDepth" className="text-sm font-mono uppercase tracking-wider">
+                      Board Depth (mm)
+                    </Label>
+                    <Input
+                      id="slatDepth"
+                      type="number"
+                      value={slatDepth}
+                      onChange={(e) => setSlatDepth(Number(e.target.value))}
+                      className="w-24 h-8 text-center font-mono bg-input border-border"
+                      min={1}
+                      max={20}
+                    />
+                  </div>
+                  <Slider
+                    value={[slatDepth]}
+                    onValueChange={(value) => setSlatDepth(value[0])}
+                    min={1}
+                    max={20}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>1mm</span>
+                    <span>20mm</span>
                   </div>
                 </div>
               </div>
@@ -230,8 +291,12 @@ const BlindGenerator = () => {
                   <span className="text-foreground">{height}mm</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-muted-foreground">Slat Height:</span>
-                  <span className="text-foreground">25mm</span>
+                  <span className="text-muted-foreground">Board Width:</span>
+                  <span className="text-foreground">{slatWidth}mm</span>
+                </div>
+                <div className="flex justify-between border-b border-border pb-2">
+                  <span className="text-muted-foreground">Board Depth:</span>
+                  <span className="text-foreground">{slatDepth}mm</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
                   <span className="text-muted-foreground">Slat Gap:</span>
@@ -239,7 +304,7 @@ const BlindGenerator = () => {
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
                   <span className="text-muted-foreground">Total Slats:</span>
-                  <span className="text-foreground">{Math.floor(height / 28)}</span>
+                  <span className="text-foreground">{Math.floor(height / (slatWidth + SLAT_GAP))}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Material:</span>
