@@ -186,6 +186,30 @@ const BlindGenerator = () => {
     console.log('Reset completed - customSupportPositions cleared');
   };
 
+  const alignSelectedToNearestDivision = () => {
+    if (selectedSupport === null) return;
+
+    const interiorHeight = height - 2 * slatDepth;
+    // current top of selected support (mm from inner top)
+    const currentTop = customSupportPositions[selectedSupport] !== undefined
+      ? customSupportPositions[selectedSupport]
+      : (selectedSupport * supportSpacing);
+
+    // align the CENTER of the support to nearest division line
+    const currentCenter = currentTop + slatDepth / 2;
+    const nearestIndex = Math.round(currentCenter / divisionSize);
+    let newTop = nearestIndex * divisionSize - slatDepth / 2;
+
+    // clamp within inner cavity
+    const minTop = 0;
+    const maxTop = Math.max(0, interiorHeight - slatDepth);
+    newTop = Math.max(minTop, Math.min(maxTop, newTop));
+
+    setCustomSupportPositions({
+      ...customSupportPositions,
+      [selectedSupport]: newTop,
+    });
+  };
   const drawBlinds = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -402,7 +426,8 @@ const BlindGenerator = () => {
     ctx.setLineDash([]);
 
     // Draw division marks inside the frame
-    const numDivisions = Math.floor(height / divisionSize);
+    const interiorHeight = height - 2 * slatDepth;
+    const numDivisions = Math.floor(interiorHeight / divisionSize);
     const scaledDivisionSize = divisionSize * scale;
     const divisionArrowX = offsetX + scaledDepth + 30;
     
@@ -413,7 +438,7 @@ const BlindGenerator = () => {
     ctx.shadowBlur = 5;
     
     for (let i = 0; i <= numDivisions; i++) {
-      const divisionY = offsetY + (i * scaledDivisionSize);
+      const divisionY = offsetY + scaledDepth + (i * scaledDivisionSize);
       
       // Draw horizontal tick mark inside frame
       ctx.beginPath();
@@ -423,7 +448,7 @@ const BlindGenerator = () => {
       
       // Draw arrow and label for segments (not after the last tick)
       if (i < numDivisions) {
-        const nextDivisionY = offsetY + ((i + 1) * scaledDivisionSize);
+        const nextDivisionY = offsetY + scaledDepth + ((i + 1) * scaledDivisionSize);
         const midY = (divisionY + nextDivisionY) / 2;
         
         // Draw vertical line between divisions
@@ -796,6 +821,23 @@ const BlindGenerator = () => {
                     <span>60mm</span>
                     <span>2440mm</span>
                   </div>
+                </div>
+
+                {/* Align selected to nearest division */}
+                <div className="pt-4 border-t border-border">
+                  <Button
+                    onClick={alignSelectedToNearestDivision}
+                    className="w-full"
+                    disabled={selectedSupport === null}
+                    variant={selectedSupport !== null ? "default" : "outline"}
+                  >
+                    {selectedSupport !== null 
+                      ? `Выровнять #${selectedSupport} к ближайшей метке`
+                      : "Выберите перекладину для выравнивания"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
+                    Центр перекладины совмещается с ближайшей меткой
+                  </p>
                 </div>
               </div>
             </Card>
