@@ -17,6 +17,10 @@ const BlindGenerator = () => {
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [customSupportPositions, setCustomSupportPositions] = useState<Record<number, number>>({}); // custom Y positions for supports (in mm from top)
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartY, setDragStartY] = useState(0);
+  const [draggedSupport, setDraggedSupport] = useState<number | null>(null);
+  const [dragStartPositions, setDragStartPositions] = useState<Record<number, number>>({});
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -67,7 +71,7 @@ const BlindGenerator = () => {
     doc.save(`cutlist-${width}x${height}.pdf`);
   };
 
-  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -105,14 +109,69 @@ const BlindGenerator = () => {
         clickY >= supportY &&
         clickY <= supportY + supportHeight
       ) {
-        // Toggle selection: if already selected, deselect; otherwise select
-        setSelectedSupport(selectedSupport === i ? null : i);
+        // Start dragging
+        setIsDragging(true);
+        setDragStartY(clickY);
+        setDraggedSupport(i);
+        
+        // Store current positions of all supports
+        const currentPositions: Record<number, number> = {};
+        for (let j = 1; j <= additionalHorizontals; j++) {
+          currentPositions[j] = customSupportPositions[j] !== undefined 
+            ? customSupportPositions[j] 
+            : (j * supportSpacing);
+        }
+        setDragStartPositions(currentPositions);
+        
+        setSelectedSupport(i);
         return;
       }
     }
 
     // If no support was clicked, deselect
     setSelectedSupport(null);
+  };
+
+  const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging || draggedSupport === null) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const currentY = event.clientY - rect.top;
+
+    // Calculate scale
+    const scale = Math.min(
+      (canvas.width - 80) / width,
+      (canvas.height - 80) / height
+    );
+
+    // Calculate delta in canvas pixels, then convert to mm
+    const deltaY = currentY - dragStartY;
+    const deltaYMm = deltaY / scale;
+
+    // Apply delta to all supports
+    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    const newPositions: Record<number, number> = {};
+    
+    for (let i = 1; i <= additionalHorizontals; i++) {
+      const startPosition = dragStartPositions[i];
+      const newPosition = startPosition + deltaYMm;
+      
+      // Constrain within bounds (between top frame and bottom frame)
+      const minY = slatDepth + 10; // Small margin from top
+      const maxY = height - slatDepth - 10; // Small margin from bottom
+      newPositions[i] = Math.max(minY, Math.min(maxY, newPosition));
+    }
+
+    setCustomSupportPositions(newPositions);
+  };
+
+  const handleCanvasMouseUp = () => {
+    setIsDragging(false);
+    setDraggedSupport(null);
+    setDragStartPositions({});
   };
 
   const alignToNearestDivision = () => {
@@ -457,7 +516,10 @@ const BlindGenerator = () => {
               width={800}
               height={600}
               className="w-full h-auto border border-border rounded bg-transparent cursor-pointer"
-              onClick={handleCanvasClick}
+              onMouseDown={handleCanvasMouseDown}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseUp={handleCanvasMouseUp}
+              onMouseLeave={handleCanvasMouseUp}
             />
             <div className="mt-4 space-y-4">
               <div className="text-sm text-muted-foreground font-mono">
