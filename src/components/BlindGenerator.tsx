@@ -235,11 +235,29 @@ const BlindGenerator = () => {
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.shadowBlur = 5;
     
-    const prevSupportY = offsetY + scaledDepth;
+    const topFrameY = offsetY + scaledDepth;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const currentSupportY = offsetY + scaledDepth + (i * supportSpacing * scale);
+      const currentSupportYPosition = customSupportPositions[i] !== undefined 
+        ? customSupportPositions[i] 
+        : (i * supportSpacing);
+      const currentSupportY = offsetY + scaledDepth + (currentSupportYPosition * scale);
       const arrowX = offsetX + scaledWidth + 30;
-      const startY = i === 1 ? prevSupportY : offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
+      
+      // Determine start position (previous support or top frame)
+      let startY;
+      let startYPosition;
+      if (i === 1) {
+        startY = topFrameY;
+        startYPosition = 0;
+      } else {
+        startYPosition = customSupportPositions[i - 1] !== undefined 
+          ? customSupportPositions[i - 1] 
+          : ((i - 1) * supportSpacing);
+        startY = offsetY + scaledDepth + (startYPosition * scale);
+      }
+      
+      // Calculate actual distance between supports
+      const distanceBetween = Math.round(currentSupportYPosition - startYPosition);
       
       // Draw vertical line
       ctx.beginPath();
@@ -270,7 +288,7 @@ const BlindGenerator = () => {
       
       ctx.setLineDash([5, 5]);
       
-      // Draw dimension text
+      // Draw dimension text with actual distance
       ctx.fillStyle = "hsl(0, 0%, 100%)";
       ctx.font = "12px monospace";
       ctx.textAlign = "center";
@@ -279,15 +297,18 @@ const BlindGenerator = () => {
       ctx.save();
       ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
       ctx.rotate(-Math.PI / 2);
-      ctx.fillText(`${supportSpacing}mm`, 0, 0);
+      ctx.fillText(`${distanceBetween}mm`, 0, 0);
       ctx.restore();
     }
     
     // Draw dimension arrow for the last segment (from last support to bottom)
     if (additionalHorizontals > 0) {
-      const lastSupportY = offsetY + scaledDepth + (additionalHorizontals * supportSpacing * scale);
+      const lastSupportYPosition = customSupportPositions[additionalHorizontals] !== undefined 
+        ? customSupportPositions[additionalHorizontals] 
+        : (additionalHorizontals * supportSpacing);
+      const lastSupportY = offsetY + scaledDepth + (lastSupportYPosition * scale);
       const bottomY = offsetY + scaledHeight - scaledDepth;
-      const lastSegmentDistance = height - scaledDepth / scale - (additionalHorizontals * supportSpacing) - slatDepth;
+      const lastSegmentDistance = Math.round(height - slatDepth - lastSupportYPosition - slatDepth);
       const arrowX = offsetX + scaledWidth + 30;
       
       // Draw vertical line
