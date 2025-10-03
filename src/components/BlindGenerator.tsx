@@ -38,12 +38,48 @@ const BlindGenerator = () => {
     const offsetX = (canvas.width - scaledWidth) / 2;
     const offsetY = (canvas.height - scaledHeight) / 2;
 
-    // Draw frame (outline only)
-    ctx.strokeStyle = "hsl(199, 89%, 48%)";
-    ctx.lineWidth = 3;
+    // Draw frame as separate rectangles with depth
+    const scaledDepth = slatDepth * scale;
+    
     ctx.shadowColor = "hsl(199, 89%, 48%)";
-    ctx.shadowBlur = 15;
-    ctx.strokeRect(offsetX, offsetY, scaledWidth, scaledHeight);
+    ctx.shadowBlur = 10;
+    
+    // Left side (depth × height)
+    const leftGradient = ctx.createLinearGradient(offsetX, offsetY, offsetX + scaledDepth, offsetY);
+    leftGradient.addColorStop(0, "hsl(199, 70%, 35%)");
+    leftGradient.addColorStop(1, "hsl(199, 80%, 45%)");
+    ctx.fillStyle = leftGradient;
+    ctx.fillRect(offsetX, offsetY, scaledDepth, scaledHeight);
+    ctx.strokeStyle = "hsl(199, 89%, 48%)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(offsetX, offsetY, scaledDepth, scaledHeight);
+    
+    // Top side (width × depth)
+    const topGradient = ctx.createLinearGradient(offsetX, offsetY, offsetX, offsetY + scaledDepth);
+    topGradient.addColorStop(0, "hsl(199, 85%, 50%)");
+    topGradient.addColorStop(1, "hsl(199, 75%, 40%)");
+    ctx.fillStyle = topGradient;
+    ctx.fillRect(offsetX + scaledDepth, offsetY, scaledWidth - 2 * scaledDepth, scaledDepth);
+    ctx.strokeStyle = "hsl(199, 89%, 48%)";
+    ctx.strokeRect(offsetX + scaledDepth, offsetY, scaledWidth - 2 * scaledDepth, scaledDepth);
+    
+    // Right side (depth × height)
+    const rightGradient = ctx.createLinearGradient(offsetX + scaledWidth - scaledDepth, offsetY, offsetX + scaledWidth, offsetY);
+    rightGradient.addColorStop(0, "hsl(199, 80%, 45%)");
+    rightGradient.addColorStop(1, "hsl(199, 60%, 30%)");
+    ctx.fillStyle = rightGradient;
+    ctx.fillRect(offsetX + scaledWidth - scaledDepth, offsetY, scaledDepth, scaledHeight);
+    ctx.strokeStyle = "hsl(199, 89%, 48%)";
+    ctx.strokeRect(offsetX + scaledWidth - scaledDepth, offsetY, scaledDepth, scaledHeight);
+    
+    // Bottom side (width × depth)
+    const bottomGradient = ctx.createLinearGradient(offsetX, offsetY + scaledHeight - scaledDepth, offsetX, offsetY + scaledHeight);
+    bottomGradient.addColorStop(0, "hsl(199, 75%, 40%)");
+    bottomGradient.addColorStop(1, "hsl(199, 65%, 35%)");
+    ctx.fillStyle = bottomGradient;
+    ctx.fillRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
+    ctx.strokeStyle = "hsl(199, 89%, 48%)";
+    ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
     // Draw dimension lines
     ctx.setLineDash([5, 5]);
