@@ -23,6 +23,12 @@ const BlindGenerator = () => {
     drawBlinds();
   }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, customSupportPositions]);
 
+  // Reset custom positions when height or supportSpacing changes
+  useEffect(() => {
+    setCustomSupportPositions({});
+    setSelectedSupport(null);
+  }, [height, supportSpacing]);
+
   const downloadCutList = () => {
     const doc = new jsPDF();
     
