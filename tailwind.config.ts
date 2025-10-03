@@ -47,16 +47,21 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+        wood: {
+          DEFAULT: "hsl(var(--wood))",
+          light: "hsl(var(--wood-light))",
+          dark: "hsl(var(--wood-dark))",
         },
+      },
+      boxShadow: {
+        glow: "var(--glow)",
+      },
+      backgroundImage: {
+        'blueprint-grid': 
+          "linear-gradient(hsl(199 40% 30% / var(--grid-opacity)) 1px, transparent 1px), linear-gradient(90deg, hsl(199 40% 30% / var(--grid-opacity)) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        'grid': '20px 20px',
       },
       borderRadius: {
         lg: "var(--radius)",
