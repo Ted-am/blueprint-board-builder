@@ -175,9 +175,15 @@ const BlindGenerator = () => {
   };
 
   const alignToNearestDivision = () => {
+    console.log('alignToNearestDivision called');
+    console.log('Current customSupportPositions:', customSupportPositions);
+    console.log('supportSpacing:', supportSpacing);
+    
     // Reset all supports to default spacing positions
     setCustomSupportPositions({});
     setSelectedSupport(null);
+    
+    console.log('Reset completed - customSupportPositions cleared');
   };
 
   const drawBlinds = () => {
