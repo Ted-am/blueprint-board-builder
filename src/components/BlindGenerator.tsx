@@ -62,26 +62,46 @@ const BlindGenerator = () => {
     // Calculate additional horizontal boards needed based on supportSpacing
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
-    const tableData = [
+    // Board Cut List
+    doc.setFontSize(14);
+    doc.text("Board Cut List", 14, 55);
+    
+    const boardTableData = [
       [verticalWidth/10, verticalHeight/10, slatDepth/10, 2],
       [horizontalWidth/10, horizontalHeight/10, slatDepth/10, 2 + additionalHorizontals],
     ];
     
-    // Add plywood cut list if plywood is selected
+    autoTable(doc, {
+      startY: 60,
+      head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
+      body: boardTableData,
+      theme: "grid",
+      headStyles: { fillColor: [41, 128, 185] },
+    });
+    
+    // Plywood Cut List (if plywood is selected)
     if (coveringMaterial === "plywood") {
       const plywoodWidth = width - 2 * slatDepth;
       const plywoodHeight = supportSpacing - slatDepth;
       const plywoodQty = 1 + additionalHorizontals;
-      tableData.push([plywoodWidth/10, plywoodHeight/10, 0.6, plywoodQty]);
+      
+      const finalY = (doc as any).lastAutoTable.finalY || 60;
+      
+      doc.setFontSize(14);
+      doc.text("Plywood Cut List", 14, finalY + 10);
+      
+      const plywoodTableData = [
+        [plywoodWidth/10, plywoodHeight/10, 0.6, plywoodQty],
+      ];
+      
+      autoTable(doc, {
+        startY: finalY + 15,
+        head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
+        body: plywoodTableData,
+        theme: "grid",
+        headStyles: { fillColor: [41, 128, 185] },
+      });
     }
-    
-    autoTable(doc, {
-      startY: 50,
-      head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
-      body: tableData,
-      theme: "grid",
-      headStyles: { fillColor: [41, 128, 185] },
-    });
     
     doc.save(`cutlist-${width}x${height}.pdf`);
   };
@@ -582,46 +602,70 @@ const BlindGenerator = () => {
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">Board Dimensions</h3>
+                  <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">Cut Lists</h3>
                   <Button onClick={downloadCutList} size="sm" className="gap-2">
                     <Download className="w-4 h-4" />
                     Download CutList
                   </Button>
                 </div>
-                <div className="border border-border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm font-mono">
-                    <thead>
-                      <tr className="bg-primary/10 border-b border-border">
-                        <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
-                        <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
-                        <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
-                        <th className="px-4 py-2 text-left text-foreground">Quantity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-border">
-                        <td className="px-4 py-2 text-foreground">{(height - 2 * slatDepth)/10}</td>
-                        <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
-                        <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
-                        <td className="px-4 py-2 text-foreground">2</td>
-                      </tr>
-                      <tr className={coveringMaterial === "plywood" ? "border-b border-border" : ""}>
-                        <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
-                        <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
-                        <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
-                        <td className="px-4 py-2 text-foreground">{2 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
-                      </tr>
-                      {coveringMaterial === "plywood" && (
+                
+                {/* Board Cut List */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Board Cut List</h4>
+                  <div className="border border-border rounded-lg overflow-hidden">
+                    <table className="w-full text-sm font-mono">
+                      <thead>
+                        <tr className="bg-primary/10 border-b border-border">
+                          <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
+                          <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
+                          <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
+                          <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-border">
+                          <td className="px-4 py-2 text-foreground">{(height - 2 * slatDepth)/10}</td>
+                          <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
+                          <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
+                          <td className="px-4 py-2 text-foreground">2</td>
+                        </tr>
                         <tr>
                           <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
-                          <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
-                          <td className="px-4 py-2 text-foreground">0.6</td>
-                          <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
+                          <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
+                          <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
+                          <td className="px-4 py-2 text-foreground">{2 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
+                
+                {/* Plywood Cut List */}
+                {coveringMaterial === "plywood" && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Plywood Cut List</h4>
+                    <div className="border border-border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm font-mono">
+                        <thead>
+                          <tr className="bg-primary/10 border-b border-border">
+                            <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
+                            <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
+                            <td className="px-4 py-2 text-foreground">0.6</td>
+                            <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Card>
