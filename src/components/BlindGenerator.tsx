@@ -79,7 +79,7 @@ const BlindGenerator = () => {
     
     // Plywood Cut List (if plywood is selected)
     if (coveringMaterial === "plywood") {
-      const plywoodWidth = width - 2 * slatDepth;
+      const plywoodWidth = width;
       const plywoodHeight = supportSpacing - slatDepth;
       const plywoodQty = 1 + additionalHorizontals;
       
@@ -594,7 +594,7 @@ const BlindGenerator = () => {
                         </thead>
                         <tbody>
                           <tr>
-                            <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
+                            <td className="px-4 py-2 text-foreground">{width/10}</td>
                             <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
                             <td className="px-4 py-2 text-foreground">0.6</td>
                             <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
