@@ -410,9 +410,37 @@ const BlindGenerator = () => {
           Technical Drawing System v1.0
         </p>
 
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+        <div className="grid lg:grid-cols-[300px_1fr_400px] gap-8">
+          {/* Left Panel - Frame Covering */}
+          <div className="space-y-6">
+            <Card className="p-6 bg-card border-border shadow-lg">
+              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                ПОКРЫТИЕ РАМЫ
+              </h2>
+
+              <div className="space-y-6">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="showCovering"
+                    checked={showCovering}
+                    onCheckedChange={(checked) => setShowCovering(checked as boolean)}
+                  />
+                  <Label
+                    htmlFor="showCovering"
+                    className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                  >
+                    Показать покрытие
+                  </Label>
+                </div>
+              </div>
+            </Card>
+          </div>
+
           {/* Canvas */}
           <Card className="p-6 border-border shadow-lg bg-transparent">
+            <h2 className="text-xl font-semibold mb-4 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+              PREVIEW
+            </h2>
             <canvas
               ref={canvasRef}
               width={800}
@@ -562,28 +590,6 @@ const BlindGenerator = () => {
                     <span>16mm</span>
                     <span>25mm</span>
                   </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-card border-border shadow-lg">
-              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                ПОКРЫТИЕ РАМЫ
-              </h2>
-
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="showCovering"
-                    checked={showCovering}
-                    onCheckedChange={(checked) => setShowCovering(checked as boolean)}
-                  />
-                  <Label
-                    htmlFor="showCovering"
-                    className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-                  >
-                    Показать покрытие
-                  </Label>
                 </div>
               </div>
             </Card>
