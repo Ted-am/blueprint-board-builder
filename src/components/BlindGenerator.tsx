@@ -248,7 +248,7 @@ const BlindGenerator = () => {
         ctx.save();
         ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${supportSpacing}mm`, 0, 0);
+        ctx.fillText(`${supportSpacing}mm / Board: ${slatDepth}mm`, 0, 0);
         ctx.restore();
       }
       
@@ -296,7 +296,7 @@ const BlindGenerator = () => {
         ctx.save();
         ctx.translate(arrowX + 25, (lastSupportY + bottomY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${Math.round(lastSegmentDistance)}mm`, 0, 0);
+        ctx.fillText(`${Math.round(lastSegmentDistance)}mm / Board: ${slatDepth}mm`, 0, 0);
         ctx.restore();
       }
     }
