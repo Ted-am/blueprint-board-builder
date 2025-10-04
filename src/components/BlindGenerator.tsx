@@ -19,6 +19,7 @@ const BlindGenerator = () => {
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
+  const [showInnerSize, setShowInnerSize] = useState(false); // show inner size
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -445,18 +446,34 @@ const BlindGenerator = () => {
               PREVIEW
             </h2>
             
-            <div className="mb-4 flex items-center space-x-3">
-              <Checkbox
-                id="showHorizontalSpacers"
-                checked={showHorizontalSpacers}
-                onCheckedChange={(checked) => setShowHorizontalSpacers(checked as boolean)}
-              />
-              <Label
-                htmlFor="showHorizontalSpacers"
-                className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-              >
-                Show horizontal spacers
-              </Label>
+            <div className="mb-4 flex items-center gap-6">
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="showHorizontalSpacers"
+                  checked={showHorizontalSpacers}
+                  onCheckedChange={(checked) => setShowHorizontalSpacers(checked as boolean)}
+                />
+                <Label
+                  htmlFor="showHorizontalSpacers"
+                  className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                >
+                  Show horizontal spacers
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="showInnerSize"
+                  checked={showInnerSize}
+                  onCheckedChange={(checked) => setShowInnerSize(checked as boolean)}
+                />
+                <Label
+                  htmlFor="showInnerSize"
+                  className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                >
+                  Inner size
+                </Label>
+              </div>
             </div>
             
             <canvas
