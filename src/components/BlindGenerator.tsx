@@ -137,7 +137,7 @@ const BlindGenerator = () => {
       
       autoTable(doc, {
         startY: startY + 10,
-        head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Qty"]],
+        head: [["Height (cm)", "Width (cm)", "Depth (cm)", "Qty"]],
         body: boardTableData,
         theme: "grid",
         headStyles: { fillColor: [41, 128, 185] },
@@ -221,7 +221,7 @@ const BlindGenerator = () => {
     
     autoTable(doc, {
       startY: 60,
-      head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
+      head: [["Height (cm)", "Width (cm)", "Depth (cm)", "Quantity"]],
       body: boardTableData,
       theme: "grid",
       headStyles: { fillColor: [41, 128, 185] },
