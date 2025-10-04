@@ -16,22 +16,11 @@ const BlindGenerator = () => {
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
-  const [customSupportPositions, setCustomSupportPositions] = useState<Record<number, number>>({}); // custom Y positions for supports (in mm from top)
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartY, setDragStartY] = useState(0);
-  const [draggedSupport, setDraggedSupport] = useState<number | null>(null);
-  const [dragStartPositions, setDragStartPositions] = useState<Record<number, number>>({});
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, customSupportPositions]);
-
-  // Reset custom positions when height, supportSpacing, or slatDepth changes
-  useEffect(() => {
-    setCustomSupportPositions({});
-    setSelectedSupport(null);
-  }, [height, supportSpacing, slatDepth]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -71,7 +60,7 @@ const BlindGenerator = () => {
     doc.save(`cutlist-${width}x${height}.pdf`);
   };
 
-  const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -94,10 +83,7 @@ const BlindGenerator = () => {
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const supportYPosition = customSupportPositions[i] !== undefined 
-        ? customSupportPositions[i] 
-        : (i * supportSpacing);
-      const supportY = offsetY + scaledDepth + (supportYPosition * scale);
+      const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
       const supportX = offsetX + scaledDepth;
       const supportWidth = scaledWidth - 2 * scaledDepth;
       const supportHeight = scaledDepth;
@@ -109,21 +95,8 @@ const BlindGenerator = () => {
         clickY >= supportY &&
         clickY <= supportY + supportHeight
       ) {
-        // Start dragging
-        setIsDragging(true);
-        setDragStartY(clickY);
-        setDraggedSupport(i);
-        
-        // Store current positions of all supports
-        const currentPositions: Record<number, number> = {};
-        for (let j = 1; j <= additionalHorizontals; j++) {
-          currentPositions[j] = customSupportPositions[j] !== undefined 
-            ? customSupportPositions[j] 
-            : (j * supportSpacing);
-        }
-        setDragStartPositions(currentPositions);
-        
-        setSelectedSupport(i);
+        // Toggle selection: if already selected, deselect; otherwise select
+        setSelectedSupport(selectedSupport === i ? null : i);
         return;
       }
     }
@@ -132,84 +105,6 @@ const BlindGenerator = () => {
     setSelectedSupport(null);
   };
 
-  const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDragging || draggedSupport === null) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const currentY = event.clientY - rect.top;
-
-    // Calculate scale
-    const scale = Math.min(
-      (canvas.width - 80) / width,
-      (canvas.height - 80) / height
-    );
-
-    // Calculate delta in canvas pixels, then convert to mm
-    const deltaY = currentY - dragStartY;
-    const deltaYMm = deltaY / scale;
-
-    // Apply delta to all supports
-    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
-    const newPositions: Record<number, number> = {};
-    
-    for (let i = 1; i <= additionalHorizontals; i++) {
-      const startPosition = dragStartPositions[i];
-      const newPosition = startPosition + deltaYMm;
-      
-      // Constrain within bounds (between top frame and bottom frame)
-      const minY = slatDepth + 10; // Small margin from top
-      const maxY = height - slatDepth - 10; // Small margin from bottom
-      newPositions[i] = Math.max(minY, Math.min(maxY, newPosition));
-    }
-
-    setCustomSupportPositions(newPositions);
-  };
-
-  const handleCanvasMouseUp = () => {
-    setIsDragging(false);
-    setDraggedSupport(null);
-    setDragStartPositions({});
-  };
-
-  const alignToNearestDivision = () => {
-    console.log('alignToNearestDivision called');
-    console.log('Current customSupportPositions:', customSupportPositions);
-    console.log('supportSpacing:', supportSpacing);
-    
-    // Reset all supports to default spacing positions
-    setCustomSupportPositions({});
-    setSelectedSupport(null);
-    
-    console.log('Reset completed - customSupportPositions cleared');
-  };
-
-  const alignSelectedToNearestDivision = () => {
-    if (selectedSupport === null) return;
-
-    const interiorHeight = height - 2 * slatDepth;
-    // current top of selected support (mm from inner top)
-    const currentTop = customSupportPositions[selectedSupport] !== undefined
-      ? customSupportPositions[selectedSupport]
-      : (selectedSupport * supportSpacing);
-
-    // align the CENTER of the support to nearest division line
-    const currentCenter = currentTop + slatDepth / 2;
-    const nearestIndex = Math.round(currentCenter / divisionSize);
-    let newTop = nearestIndex * divisionSize - slatDepth / 2;
-
-    // clamp within inner cavity
-    const minTop = 0;
-    const maxTop = Math.max(0, interiorHeight - slatDepth);
-    newTop = Math.max(minTop, Math.min(maxTop, newTop));
-
-    setCustomSupportPositions({
-      ...customSupportPositions,
-      [selectedSupport]: newTop,
-    });
-  };
   const drawBlinds = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -277,11 +172,7 @@ const BlindGenerator = () => {
     // Draw additional horizontal supports based on supportSpacing
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      // Use custom position if set, otherwise use default spacing
-      const supportYPosition = customSupportPositions[i] !== undefined 
-        ? customSupportPositions[i] 
-        : (i * supportSpacing);
-      const supportY = offsetY + scaledDepth + (supportYPosition * scale);
+      const supportY = offsetY + scaledDepth + (i * supportSpacing * scale);
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
       
       // Highlight selected support
@@ -306,29 +197,11 @@ const BlindGenerator = () => {
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.shadowBlur = 5;
     
-    const topFrameY = offsetY + scaledDepth;
+    const prevSupportY = offsetY + scaledDepth;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const currentSupportYPosition = customSupportPositions[i] !== undefined 
-        ? customSupportPositions[i] 
-        : (i * supportSpacing);
-      const currentSupportY = offsetY + scaledDepth + (currentSupportYPosition * scale);
+      const currentSupportY = offsetY + scaledDepth + (i * supportSpacing * scale);
       const arrowX = offsetX + scaledWidth + 30;
-      
-      // Determine start position (previous support or top frame)
-      let startY;
-      let startYPosition;
-      if (i === 1) {
-        startY = topFrameY;
-        startYPosition = 0;
-      } else {
-        startYPosition = customSupportPositions[i - 1] !== undefined 
-          ? customSupportPositions[i - 1] 
-          : ((i - 1) * supportSpacing);
-        startY = offsetY + scaledDepth + (startYPosition * scale);
-      }
-      
-      // Calculate actual distance between supports
-      const distanceBetween = Math.round(currentSupportYPosition - startYPosition);
+      const startY = i === 1 ? prevSupportY : offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
       
       // Draw vertical line
       ctx.beginPath();
@@ -359,7 +232,7 @@ const BlindGenerator = () => {
       
       ctx.setLineDash([5, 5]);
       
-      // Draw dimension text with actual distance
+      // Draw dimension text
       ctx.fillStyle = "hsl(0, 0%, 100%)";
       ctx.font = "12px monospace";
       ctx.textAlign = "center";
@@ -368,18 +241,15 @@ const BlindGenerator = () => {
       ctx.save();
       ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
       ctx.rotate(-Math.PI / 2);
-      ctx.fillText(`${distanceBetween}mm`, 0, 0);
+      ctx.fillText(`${supportSpacing}mm`, 0, 0);
       ctx.restore();
     }
     
     // Draw dimension arrow for the last segment (from last support to bottom)
     if (additionalHorizontals > 0) {
-      const lastSupportYPosition = customSupportPositions[additionalHorizontals] !== undefined 
-        ? customSupportPositions[additionalHorizontals] 
-        : (additionalHorizontals * supportSpacing);
-      const lastSupportY = offsetY + scaledDepth + (lastSupportYPosition * scale);
+      const lastSupportY = offsetY + scaledDepth + (additionalHorizontals * supportSpacing * scale);
       const bottomY = offsetY + scaledHeight - scaledDepth;
-      const lastSegmentDistance = Math.round(height - slatDepth - lastSupportYPosition - slatDepth);
+      const lastSegmentDistance = height - scaledDepth / scale - (additionalHorizontals * supportSpacing) - slatDepth;
       const arrowX = offsetX + scaledWidth + 30;
       
       // Draw vertical line
@@ -426,8 +296,7 @@ const BlindGenerator = () => {
     ctx.setLineDash([]);
 
     // Draw division marks inside the frame
-    const interiorHeight = height - 2 * slatDepth;
-    const numDivisions = Math.floor(interiorHeight / divisionSize);
+    const numDivisions = Math.floor(height / divisionSize);
     const scaledDivisionSize = divisionSize * scale;
     const divisionArrowX = offsetX + scaledDepth + 30;
     
@@ -438,7 +307,7 @@ const BlindGenerator = () => {
     ctx.shadowBlur = 5;
     
     for (let i = 0; i <= numDivisions; i++) {
-      const divisionY = offsetY + scaledDepth + (i * scaledDivisionSize);
+      const divisionY = offsetY + (i * scaledDivisionSize);
       
       // Draw horizontal tick mark inside frame
       ctx.beginPath();
@@ -448,7 +317,7 @@ const BlindGenerator = () => {
       
       // Draw arrow and label for segments (not after the last tick)
       if (i < numDivisions) {
-        const nextDivisionY = offsetY + scaledDepth + ((i + 1) * scaledDivisionSize);
+        const nextDivisionY = offsetY + ((i + 1) * scaledDivisionSize);
         const midY = (divisionY + nextDivisionY) / 2;
         
         // Draw vertical line between divisions
@@ -547,10 +416,7 @@ const BlindGenerator = () => {
               width={800}
               height={600}
               className="w-full h-auto border border-border rounded bg-transparent cursor-pointer"
-              onMouseDown={handleCanvasMouseDown}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseUp={handleCanvasMouseUp}
-              onMouseLeave={handleCanvasMouseUp}
+              onClick={handleCanvasClick}
             />
             <div className="mt-4 space-y-4">
               <div className="text-sm text-muted-foreground font-mono">
@@ -771,19 +637,6 @@ const BlindGenerator = () => {
                     <span>640mm</span>
                   </div>
                 </div>
-
-                {/* Align to Division Button */}
-                <div className="pt-4 border-t border-border">
-                  <Button
-                    onClick={alignToNearestDivision}
-                    className="w-full"
-                  >
-                    Выровнять по SUPPORT SPACING
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
-                    Вернуть все перекладины в исходные позиции
-                  </p>
-                </div>
               </div>
             </Card>
 
@@ -821,23 +674,6 @@ const BlindGenerator = () => {
                     <span>60mm</span>
                     <span>2440mm</span>
                   </div>
-                </div>
-
-                {/* Align selected to nearest division */}
-                <div className="pt-4 border-t border-border">
-                  <Button
-                    onClick={alignSelectedToNearestDivision}
-                    className="w-full"
-                    disabled={selectedSupport === null}
-                    variant={selectedSupport !== null ? "default" : "outline"}
-                  >
-                    {selectedSupport !== null 
-                      ? `Выровнять #${selectedSupport} к ближайшей метке`
-                      : "Выберите перекладину для выравнивания"}
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
-                    Центр перекладины совмещается с ближайшей меткой
-                  </p>
                 </div>
               </div>
             </Card>
