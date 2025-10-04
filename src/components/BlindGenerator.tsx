@@ -16,12 +16,10 @@ const BlindGenerator = () => {
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
   const [slatDepth, setSlatDepth] = useState(20); // mm board depth
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
-  const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
   const [coveringMaterial, setCoveringMaterial] = useState<string>("plywood"); // covering material type
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
-  const [showInnerSize, setShowInnerSize] = useState(false); // show inner size
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -38,7 +36,7 @@ const BlindGenerator = () => {
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, showCovering, showHorizontalSpacers, showInnerSize]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -377,76 +375,6 @@ const BlindGenerator = () => {
     
     ctx.setLineDash([]);
 
-    // Draw division marks inside the frame
-    if (showInnerSize) {
-      const numDivisions = Math.floor(height / divisionSize);
-      const scaledDivisionSize = divisionSize * scale;
-      const divisionArrowX = offsetX + scaledDepth + 30;
-      
-      ctx.setLineDash([]);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "hsl(199, 89%, 48%)";
-      ctx.fillStyle = "hsl(199, 89%, 48%)";
-      ctx.shadowBlur = 5;
-      
-      for (let i = 0; i <= numDivisions; i++) {
-        const divisionY = offsetY + (i * scaledDivisionSize);
-        
-        // Draw horizontal tick mark inside frame
-        ctx.beginPath();
-        ctx.moveTo(offsetX + scaledDepth, divisionY);
-        ctx.lineTo(divisionArrowX - 5, divisionY);
-        ctx.stroke();
-        
-        // Draw arrow and label for segments (not after the last tick)
-        if (i < numDivisions) {
-          const nextDivisionY = offsetY + ((i + 1) * scaledDivisionSize);
-          const midY = (divisionY + nextDivisionY) / 2;
-          
-          // Draw vertical line between divisions
-          ctx.setLineDash([5, 5]);
-          ctx.beginPath();
-          ctx.moveTo(divisionArrowX, divisionY);
-          ctx.lineTo(divisionArrowX, nextDivisionY);
-          ctx.stroke();
-          
-          // Draw arrows
-          const arrowSize = 8;
-          ctx.setLineDash([]);
-          
-          // Top arrow
-          ctx.beginPath();
-          ctx.moveTo(divisionArrowX, divisionY);
-          ctx.lineTo(divisionArrowX - arrowSize / 2, divisionY + arrowSize);
-          ctx.lineTo(divisionArrowX + arrowSize / 2, divisionY + arrowSize);
-          ctx.closePath();
-          ctx.fill();
-          
-          // Bottom arrow
-          ctx.beginPath();
-          ctx.moveTo(divisionArrowX, nextDivisionY);
-          ctx.lineTo(divisionArrowX - arrowSize / 2, nextDivisionY - arrowSize);
-          ctx.lineTo(divisionArrowX + arrowSize / 2, nextDivisionY - arrowSize);
-          ctx.closePath();
-          ctx.fill();
-          
-          // Draw dimension text
-          ctx.fillStyle = "hsl(0, 0%, 100%)";
-          ctx.font = "16px monospace";
-          ctx.textAlign = "center";
-          ctx.shadowBlur = 15;
-          
-          ctx.save();
-          ctx.translate(divisionArrowX + 20, midY);
-          ctx.rotate(-Math.PI / 2);
-          ctx.fillText(`${divisionSize/10}cm`, 0, 0);
-          ctx.restore();
-          
-          ctx.fillStyle = "hsl(199, 89%, 48%)";
-        }
-      }
-    }
-
     // Draw dimension lines
     ctx.setLineDash([5, 5]);
     ctx.lineWidth = 1;
@@ -591,20 +519,6 @@ const BlindGenerator = () => {
                   className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                 >
                   Show horizontal spacers
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="showInnerSize"
-                  checked={showInnerSize}
-                  onCheckedChange={(checked) => setShowInnerSize(checked as boolean)}
-                />
-                <Label
-                  htmlFor="showInnerSize"
-                  className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-                >
-                  Inner size
                 </Label>
               </div>
             </div>
@@ -859,43 +773,6 @@ const BlindGenerator = () => {
               </div>
             </Card>
 
-            <Card className="p-6 bg-card border-border shadow-lg">
-              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                INTERNAL DIVISIONS
-              </h2>
-
-              <div className="space-y-6">
-                {/* Division Size Control */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="divisionSize" className="text-sm font-mono uppercase tracking-wider">
-                      Division Size (cm)
-                    </Label>
-                    <Input
-                      id="divisionSize"
-                      type="number"
-                      value={divisionSize}
-                      onChange={(e) => setDivisionSize(Number(e.target.value))}
-                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={60}
-                      max={2440}
-                    />
-                  </div>
-                  <Slider
-                    value={[divisionSize]}
-                    onValueChange={(value) => setDivisionSize(value[0])}
-                    min={60}
-                    max={2440}
-                    step={10}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>6cm</span>
-                    <span>244cm</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
           </div>
         </div>
       </div>
