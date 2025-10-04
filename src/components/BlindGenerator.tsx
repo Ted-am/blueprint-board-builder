@@ -24,7 +24,7 @@ const BlindGenerator = () => {
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, showCovering, showHorizontalSpacers]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, showCovering, showHorizontalSpacers, showInnerSize]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -302,70 +302,72 @@ const BlindGenerator = () => {
     ctx.setLineDash([]);
 
     // Draw division marks inside the frame
-    const numDivisions = Math.floor(height / divisionSize);
-    const scaledDivisionSize = divisionSize * scale;
-    const divisionArrowX = offsetX + scaledDepth + 30;
-    
-    ctx.setLineDash([]);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "hsl(199, 89%, 48%)";
-    ctx.fillStyle = "hsl(199, 89%, 48%)";
-    ctx.shadowBlur = 5;
-    
-    for (let i = 0; i <= numDivisions; i++) {
-      const divisionY = offsetY + (i * scaledDivisionSize);
+    if (showInnerSize) {
+      const numDivisions = Math.floor(height / divisionSize);
+      const scaledDivisionSize = divisionSize * scale;
+      const divisionArrowX = offsetX + scaledDepth + 30;
       
-      // Draw horizontal tick mark inside frame
-      ctx.beginPath();
-      ctx.moveTo(offsetX + scaledDepth, divisionY);
-      ctx.lineTo(divisionArrowX - 5, divisionY);
-      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "hsl(199, 89%, 48%)";
+      ctx.fillStyle = "hsl(199, 89%, 48%)";
+      ctx.shadowBlur = 5;
       
-      // Draw arrow and label for segments (not after the last tick)
-      if (i < numDivisions) {
-        const nextDivisionY = offsetY + ((i + 1) * scaledDivisionSize);
-        const midY = (divisionY + nextDivisionY) / 2;
+      for (let i = 0; i <= numDivisions; i++) {
+        const divisionY = offsetY + (i * scaledDivisionSize);
         
-        // Draw vertical line between divisions
-        ctx.setLineDash([5, 5]);
+        // Draw horizontal tick mark inside frame
         ctx.beginPath();
-        ctx.moveTo(divisionArrowX, divisionY);
-        ctx.lineTo(divisionArrowX, nextDivisionY);
+        ctx.moveTo(offsetX + scaledDepth, divisionY);
+        ctx.lineTo(divisionArrowX - 5, divisionY);
         ctx.stroke();
         
-        // Draw arrows
-        const arrowSize = 8;
-        ctx.setLineDash([]);
-        
-        // Top arrow
-        ctx.beginPath();
-        ctx.moveTo(divisionArrowX, divisionY);
-        ctx.lineTo(divisionArrowX - arrowSize / 2, divisionY + arrowSize);
-        ctx.lineTo(divisionArrowX + arrowSize / 2, divisionY + arrowSize);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Bottom arrow
-        ctx.beginPath();
-        ctx.moveTo(divisionArrowX, nextDivisionY);
-        ctx.lineTo(divisionArrowX - arrowSize / 2, nextDivisionY - arrowSize);
-        ctx.lineTo(divisionArrowX + arrowSize / 2, nextDivisionY - arrowSize);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Draw dimension text
-        ctx.fillStyle = "hsl(0, 0%, 100%)";
-        ctx.font = "16px monospace";
-        ctx.textAlign = "center";
-        ctx.shadowBlur = 15;
-        
-        ctx.save();
-        ctx.translate(divisionArrowX + 20, midY);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillText(String(divisionSize), 0, 0);
-        ctx.restore();
-        
-        ctx.fillStyle = "hsl(199, 89%, 48%)";
+        // Draw arrow and label for segments (not after the last tick)
+        if (i < numDivisions) {
+          const nextDivisionY = offsetY + ((i + 1) * scaledDivisionSize);
+          const midY = (divisionY + nextDivisionY) / 2;
+          
+          // Draw vertical line between divisions
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(divisionArrowX, divisionY);
+          ctx.lineTo(divisionArrowX, nextDivisionY);
+          ctx.stroke();
+          
+          // Draw arrows
+          const arrowSize = 8;
+          ctx.setLineDash([]);
+          
+          // Top arrow
+          ctx.beginPath();
+          ctx.moveTo(divisionArrowX, divisionY);
+          ctx.lineTo(divisionArrowX - arrowSize / 2, divisionY + arrowSize);
+          ctx.lineTo(divisionArrowX + arrowSize / 2, divisionY + arrowSize);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Bottom arrow
+          ctx.beginPath();
+          ctx.moveTo(divisionArrowX, nextDivisionY);
+          ctx.lineTo(divisionArrowX - arrowSize / 2, nextDivisionY - arrowSize);
+          ctx.lineTo(divisionArrowX + arrowSize / 2, nextDivisionY - arrowSize);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Draw dimension text
+          ctx.fillStyle = "hsl(0, 0%, 100%)";
+          ctx.font = "16px monospace";
+          ctx.textAlign = "center";
+          ctx.shadowBlur = 15;
+          
+          ctx.save();
+          ctx.translate(divisionArrowX + 20, midY);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillText(String(divisionSize), 0, 0);
+          ctx.restore();
+          
+          ctx.fillStyle = "hsl(199, 89%, 48%)";
+        }
       }
     }
 
