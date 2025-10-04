@@ -103,6 +103,30 @@ const BlindGenerator = () => {
       });
     }
     
+    // Fabric Cut List (if fabric is selected)
+    if (coveringMaterial === "fabric") {
+      const fabricWidth = width - 2 * slatDepth;
+      const fabricHeight = supportSpacing - slatDepth;
+      const fabricQty = 1 + additionalHorizontals;
+      
+      const finalY = (doc as any).lastAutoTable.finalY || 60;
+      
+      doc.setFontSize(14);
+      doc.text("Fabric Cut List", 14, finalY + 10);
+      
+      const fabricTableData = [
+        [fabricWidth/10, fabricHeight/10, "-", fabricQty],
+      ];
+      
+      autoTable(doc, {
+        startY: finalY + 15,
+        head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
+        body: fabricTableData,
+        theme: "grid",
+        headStyles: { fillColor: [41, 128, 185] },
+      });
+    }
+    
     doc.save(`cutlist-${width}x${height}.pdf`);
   };
 
@@ -659,6 +683,33 @@ const BlindGenerator = () => {
                             <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
                             <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
                             <td className="px-4 py-2 text-foreground">0.6</td>
+                            <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Fabric Cut List */}
+                {coveringMaterial === "fabric" && (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Fabric Cut List</h4>
+                    <div className="border border-border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm font-mono">
+                        <thead>
+                          <tr className="bg-primary/10 border-b border-border">
+                            <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
+                            <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
+                            <td className="px-4 py-2 text-foreground">-</td>
                             <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                           </tr>
                         </tbody>
