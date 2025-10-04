@@ -570,7 +570,6 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={500}
                       max={1600}
-                      step={10}
                     />
                   </div>
                   <Slider
@@ -601,7 +600,6 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={100}
                       max={4000}
-                      step={10}
                     />
                   </div>
                   <Slider
@@ -632,7 +630,6 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={16}
                       max={25}
-                      step={1}
                     />
                   </div>
                   <Slider
@@ -671,7 +668,6 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={20}
                       max={100}
-                      step={1}
                     />
                   </div>
                   <Slider
@@ -710,7 +706,6 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={400}
                       max={640}
-                      step={10}
                     />
                   </div>
                   <Slider
@@ -749,7 +744,6 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={60}
                       max={2440}
-                      step={10}
                     />
                   </div>
                   <Slider
