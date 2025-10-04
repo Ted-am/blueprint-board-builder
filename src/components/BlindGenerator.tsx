@@ -80,18 +80,34 @@ const BlindGenerator = () => {
     
     // Plywood Cut List (if plywood is selected)
     if (coveringMaterial === "plywood") {
-      const plywoodWidth = width;
-      const plywoodHeight = supportSpacing - slatDepth;
-      const plywoodQty = 1 + additionalHorizontals;
+      const plywoodTableData: any[] = [];
+      
+      if (width < 122) {
+        // Calculate plywood plates based on 2440mm standard height
+        const standardPlatesQty = Math.floor(height / 2440);
+        const remainingHeight = height % 2440;
+        
+        // Add standard plates (Width x 2440mm)
+        if (standardPlatesQty > 0) {
+          plywoodTableData.push([width/10, 2440/10, plywoodThickness/10, standardPlatesQty]);
+        }
+        
+        // Add remaining plate if there's a remainder
+        if (remainingHeight > 0) {
+          plywoodTableData.push([width/10, remainingHeight/10, plywoodThickness/10, 1]);
+        }
+      } else {
+        // Original logic for width >= 122
+        const plywoodWidth = width;
+        const plywoodHeight = supportSpacing - slatDepth;
+        const plywoodQty = 1 + additionalHorizontals;
+        plywoodTableData.push([plywoodWidth/10, plywoodHeight/10, plywoodThickness/10, plywoodQty]);
+      }
       
       const finalY = (doc as any).lastAutoTable.finalY || 60;
       
       doc.setFontSize(14);
       doc.text("Plywood Cut List", 14, finalY + 10);
-      
-      const plywoodTableData = [
-        [plywoodWidth/10, plywoodHeight/10, plywoodThickness/10, plywoodQty],
-      ];
       
       autoTable(doc, {
         startY: finalY + 15,
