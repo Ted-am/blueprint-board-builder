@@ -394,7 +394,7 @@ const BlindGenerator = () => {
         const saturation = Math.floor(Math.random() * 30) + 20; // 20-50%
         const lightness = Math.floor(Math.random() * 30) + 40; // 40-70%
         
-        ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+        ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.9)`;
         
         // Calculate panel position
         let panelY, panelHeight;
