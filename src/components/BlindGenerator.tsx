@@ -46,11 +46,19 @@ const BlindGenerator = () => {
       setBin(bin.map(frame => {
         // Extract height and width from the old name or use frame dimensions
         const nameParts = frame.name.split('_');
-        const height = nameParts.length >= 2 ? nameParts[nameParts.length - 2] : frame.height;
-        const width = nameParts.length >= 3 ? nameParts[nameParts.length - 1] : frame.width;
+        if (nameParts.length >= 2) {
+          const dimensionPart = nameParts[nameParts.length - 1];
+          const dimensions = dimensionPart.split('X');
+          const height = dimensions.length >= 1 ? dimensions[0] : frame.height;
+          const width = dimensions.length >= 2 ? dimensions[1] : frame.width;
+          return {
+            ...frame,
+            name: `${binName}_${height}X${width}`
+          };
+        }
         return {
           ...frame,
-          name: `${binName}_${height}_${width}`
+          name: `${binName}_${frame.height}X${frame.width}`
         };
       }));
     }
@@ -79,7 +87,7 @@ const BlindGenerator = () => {
     }
     
     const newFrame: FrameData = {
-      name: `${binName}_${height}_${width}`,
+      name: `${binName}_${height}X${width}`,
       width,
       height,
       slatWidth,
