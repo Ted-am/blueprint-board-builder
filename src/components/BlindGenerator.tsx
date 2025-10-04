@@ -43,8 +43,8 @@ const BlindGenerator = () => {
     doc.text("Cut List - Wooden Blind", 14, 20);
     
     doc.setFontSize(12);
-    doc.text(`Frame: ${width}mm × ${height}mm`, 14, 30);
-    doc.text(`Board Depth: ${slatDepth}mm`, 14, 37);
+    doc.text(`Frame: ${width/10}cm × ${height/10}cm`, 14, 30);
+    doc.text(`Board Depth: ${slatDepth/10}cm`, 14, 37);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 44);
     
     // Vertical boards - rotate so longer side is width
@@ -59,13 +59,13 @@ const BlindGenerator = () => {
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
     const tableData = [
-      [verticalWidth, verticalHeight, slatDepth, 2],
-      [horizontalWidth, horizontalHeight, slatDepth, 2 + additionalHorizontals],
+      [verticalWidth/10, verticalHeight/10, slatDepth/10, 2],
+      [horizontalWidth/10, horizontalHeight/10, slatDepth/10, 2 + additionalHorizontals],
     ];
     
     autoTable(doc, {
       startY: 50,
-      head: [["Width (mm)", "Height (mm)", "Depth (mm)", "Quantity"]],
+      head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
       body: tableData,
       theme: "grid",
       headStyles: { fillColor: [41, 128, 185] },
@@ -256,7 +256,7 @@ const BlindGenerator = () => {
         ctx.save();
         ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${supportSpacing}mm`, 0, 0);
+        ctx.fillText(`${supportSpacing/10}cm`, 0, 0);
         ctx.restore();
       }
       
@@ -304,7 +304,7 @@ const BlindGenerator = () => {
         ctx.save();
         ctx.translate(arrowX + 25, (lastSupportY + bottomY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${Math.round(lastSegmentDistance)}mm`, 0, 0);
+        ctx.fillText(`${(Math.round(lastSegmentDistance)/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
       }
     }
@@ -373,7 +373,7 @@ const BlindGenerator = () => {
           ctx.save();
           ctx.translate(divisionArrowX + 20, midY);
           ctx.rotate(-Math.PI / 2);
-          ctx.fillText(String(divisionSize), 0, 0);
+          ctx.fillText(`${divisionSize/10}cm`, 0, 0);
           ctx.restore();
           
           ctx.fillStyle = "hsl(199, 89%, 48%)";
@@ -405,12 +405,12 @@ const BlindGenerator = () => {
     ctx.font = "16px monospace";
     ctx.textAlign = "center";
     ctx.shadowBlur = 15;
-    ctx.fillText(`${width}mm`, offsetX + scaledWidth / 2, offsetY - 25);
+    ctx.fillText(`${width/10}cm`, offsetX + scaledWidth / 2, offsetY - 25);
     
     ctx.save();
     ctx.translate(offsetX - 30, offsetY + scaledHeight / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText(`${height}mm`, 0, 0);
+    ctx.fillText(`${height/10}cm`, 0, 0);
     ctx.restore();
 
     ctx.shadowBlur = 0;
@@ -476,7 +476,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="supportSpacing" className="text-sm font-mono uppercase tracking-wider">
-                      Spacing (mm)
+                      Spacing (cm)
                     </Label>
                     <Input
                       id="supportSpacing"
@@ -499,8 +499,8 @@ const BlindGenerator = () => {
                     disabled={coveringMaterial === "plywood"}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>400mm</span>
-                    <span>640mm</span>
+                    <span>40cm</span>
+                    <span>64cm</span>
                   </div>
                 </div>
               </div>
@@ -570,23 +570,23 @@ const BlindGenerator = () => {
                   <table className="w-full text-sm font-mono">
                     <thead>
                       <tr className="bg-primary/10 border-b border-border">
-                        <th className="px-4 py-2 text-left text-foreground">Width (mm)</th>
-                        <th className="px-4 py-2 text-left text-foreground">Height (mm)</th>
-                        <th className="px-4 py-2 text-left text-foreground">Depth (mm)</th>
+                        <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
+                        <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
+                        <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
                         <th className="px-4 py-2 text-left text-foreground">Quantity</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr className="border-b border-border">
-                        <td className="px-4 py-2 text-foreground">{height - 2 * slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">{slatWidth}</td>
-                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{(height - 2 * slatDepth)/10}</td>
+                        <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
+                        <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
                         <td className="px-4 py-2 text-foreground">2</td>
                       </tr>
                       <tr>
-                        <td className="px-4 py-2 text-foreground">{width - 2 * slatDepth}</td>
-                        <td className="px-4 py-2 text-foreground">{slatWidth}</td>
-                        <td className="px-4 py-2 text-foreground">{slatDepth}</td>
+                        <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
+                        <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
+                        <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
                         <td className="px-4 py-2 text-foreground">{2 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                       </tr>
                     </tbody>
@@ -608,7 +608,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="width" className="text-sm font-mono uppercase tracking-wider">
-                      Width (mm)
+                      Width (cm)
                     </Label>
                     <Input
                       id="width"
@@ -629,8 +629,8 @@ const BlindGenerator = () => {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>500mm</span>
-                    <span>1600mm</span>
+                    <span>50cm</span>
+                    <span>160cm</span>
                   </div>
                 </div>
 
@@ -638,7 +638,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="height" className="text-sm font-mono uppercase tracking-wider">
-                      Height (mm)
+                      Height (cm)
                     </Label>
                     <Input
                       id="height"
@@ -659,8 +659,8 @@ const BlindGenerator = () => {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>100mm</span>
-                    <span>4000mm</span>
+                    <span>10cm</span>
+                    <span>400cm</span>
                   </div>
                 </div>
 
@@ -668,7 +668,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="slatDepth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Depth (mm)
+                      Board Depth (cm)
                     </Label>
                     <Input
                       id="slatDepth"
@@ -689,8 +689,8 @@ const BlindGenerator = () => {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>16mm</span>
-                    <span>25mm</span>
+                    <span>1.6cm</span>
+                    <span>2.5cm</span>
                   </div>
                 </div>
               </div>
@@ -706,7 +706,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="slatWidth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Height (mm)
+                      Board Height (cm)
                     </Label>
                     <Input
                       id="slatWidth"
@@ -727,8 +727,8 @@ const BlindGenerator = () => {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>20mm</span>
-                    <span>100mm</span>
+                    <span>2cm</span>
+                    <span>10cm</span>
                   </div>
                 </div>
               </div>
@@ -744,7 +744,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="divisionSize" className="text-sm font-mono uppercase tracking-wider">
-                      Division Size (mm)
+                      Division Size (cm)
                     </Label>
                     <Input
                       id="divisionSize"
@@ -765,8 +765,8 @@ const BlindGenerator = () => {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>60mm</span>
-                    <span>2440mm</span>
+                    <span>6cm</span>
+                    <span>244cm</span>
                   </div>
                 </div>
               </div>
