@@ -427,20 +427,6 @@ const BlindGenerator = () => {
               </h2>
 
               <div className="space-y-6">
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="showCovering"
-                    checked={showCovering}
-                    onCheckedChange={(checked) => setShowCovering(checked as boolean)}
-                  />
-                  <Label
-                    htmlFor="showCovering"
-                    className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-                  >
-                    Show covering
-                  </Label>
-                </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="coveringMaterial" className="text-sm font-mono uppercase tracking-wider">
                     Material
@@ -454,6 +440,20 @@ const BlindGenerator = () => {
                       <SelectItem value="plywood">Plywood</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="showCovering"
+                    checked={showCovering}
+                    onCheckedChange={(checked) => setShowCovering(checked as boolean)}
+                  />
+                  <Label
+                    htmlFor="showCovering"
+                    className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                  >
+                    Show covering
+                  </Label>
                 </div>
               </div>
             </Card>
