@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Download } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -16,11 +17,12 @@ const BlindGenerator = () => {
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
+  const [showCovering, setShowCovering] = useState(false); // show frame covering
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, showCovering]);
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -560,6 +562,28 @@ const BlindGenerator = () => {
                     <span>16mm</span>
                     <span>25mm</span>
                   </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-card border-border shadow-lg">
+              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                ПОКРЫТИЕ РАМЫ
+              </h2>
+
+              <div className="space-y-6">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="showCovering"
+                    checked={showCovering}
+                    onCheckedChange={(checked) => setShowCovering(checked as boolean)}
+                  />
+                  <Label
+                    htmlFor="showCovering"
+                    className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                  >
+                    Показать покрытие
+                  </Label>
                 </div>
               </div>
             </Card>
