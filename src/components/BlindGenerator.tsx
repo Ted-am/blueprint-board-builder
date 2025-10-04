@@ -419,7 +419,7 @@ const BlindGenerator = () => {
         </p>
 
         <div className="grid lg:grid-cols-[300px_1fr_400px] gap-8">
-          {/* Left Panel - Frame Covering */}
+          {/* Left Panel - Frame Covering & Support Spacing */}
           <div className="space-y-6">
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
@@ -454,6 +454,46 @@ const BlindGenerator = () => {
                   >
                     Show covering
                   </Label>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-card border-border shadow-lg opacity-50 pointer-events-none" style={coveringMaterial === "plywood" ? {} : { opacity: 1, pointerEvents: 'auto' }}>
+              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                SUPPORT SPACING
+              </h2>
+
+              <div className="space-y-6">
+                {/* Support Spacing Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="supportSpacing" className="text-sm font-mono uppercase tracking-wider">
+                      Spacing (mm)
+                    </Label>
+                    <Input
+                      id="supportSpacing"
+                      type="number"
+                      value={supportSpacing}
+                      onChange={(e) => setSupportSpacing(Number(e.target.value))}
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+                      min={400}
+                      max={640}
+                      disabled={coveringMaterial === "plywood"}
+                    />
+                  </div>
+                  <Slider
+                    value={[supportSpacing]}
+                    onValueChange={(value) => setSupportSpacing(value[0])}
+                    min={400}
+                    max={640}
+                    step={10}
+                    className="w-full"
+                    disabled={coveringMaterial === "plywood"}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>400mm</span>
+                    <span>640mm</span>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -681,46 +721,6 @@ const BlindGenerator = () => {
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>20mm</span>
                     <span>100mm</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-card border-border shadow-lg opacity-50 pointer-events-none" style={coveringMaterial === "plywood" ? {} : { opacity: 1, pointerEvents: 'auto' }}>
-              <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                SUPPORT SPACING
-              </h2>
-
-              <div className="space-y-6">
-                {/* Support Spacing Control */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="supportSpacing" className="text-sm font-mono uppercase tracking-wider">
-                      Spacing (mm)
-                    </Label>
-                    <Input
-                      id="supportSpacing"
-                      type="number"
-                      value={supportSpacing}
-                      onChange={(e) => setSupportSpacing(Number(e.target.value))}
-                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={400}
-                      max={640}
-                      disabled={coveringMaterial === "plywood"}
-                    />
-                  </div>
-                  <Slider
-                    value={[supportSpacing]}
-                    onValueChange={(value) => setSupportSpacing(value[0])}
-                    min={400}
-                    max={640}
-                    step={10}
-                    className="w-full"
-                    disabled={coveringMaterial === "plywood"}
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>400mm</span>
-                    <span>640mm</span>
                   </div>
                 </div>
               </div>
