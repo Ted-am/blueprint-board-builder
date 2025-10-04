@@ -35,10 +35,10 @@ const BlindGenerator = () => {
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Pool management state
-  const [poolName, setPoolName] = useState("");
-  const [pool, setPool] = useState<FrameData[]>([]);
-  const [showPoolDialog, setShowPoolDialog] = useState(false);
+  // Bin management state
+  const [binName, setBinName] = useState("");
+  const [bin, setBin] = useState<FrameData[]>([]);
+  const [showBinDialog, setShowBinDialog] = useState(false);
 
   useEffect(() => {
     if (coveringMaterial === "plywood") {
@@ -56,14 +56,14 @@ const BlindGenerator = () => {
     drawBlinds();
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers]);
 
-  const addToPool = () => {
-    if (!poolName.trim()) {
+  const addToBin = () => {
+    if (!binName.trim()) {
       alert("Please enter a name for the frame");
       return;
     }
     
     const newFrame: FrameData = {
-      name: poolName,
+      name: binName,
       width,
       height,
       slatWidth,
@@ -73,34 +73,34 @@ const BlindGenerator = () => {
       plywoodThickness,
     };
     
-    setPool([...pool, newFrame]);
-    setPoolName("");
+    setBin([...bin, newFrame]);
+    setBinName("");
   };
   
-  const clearPool = () => {
-    if (confirm("Are you sure you want to clear the pool?")) {
-      setPool([]);
+  const clearBin = () => {
+    if (confirm("Are you sure you want to clear the bin?")) {
+      setBin([]);
     }
   };
   
-  const exportPool = () => {
-    if (pool.length === 0) {
-      alert("Pool is empty");
+  const exportBin = () => {
+    if (bin.length === 0) {
+      alert("Bin is empty");
       return;
     }
     
     const doc = new jsPDF();
     
     doc.setFontSize(18);
-    doc.text("Pool Cut List", 14, 20);
+    doc.text("Bin Cut List", 14, 20);
     
     doc.setFontSize(12);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
-    doc.text(`Total Frames: ${pool.length}`, 14, 37);
+    doc.text(`Total Frames: ${bin.length}`, 14, 37);
     
     let startY = 50;
     
-    pool.forEach((frame, index) => {
+    bin.forEach((frame, index) => {
       // Frame header
       doc.setFontSize(14);
       doc.text(`Frame ${index + 1}: ${frame.name}`, 14, startY);
@@ -163,13 +163,13 @@ const BlindGenerator = () => {
       startY = (doc as any).lastAutoTable.finalY + 15;
       
       // Add new page if needed
-      if (startY > 250 && index < pool.length - 1) {
+      if (startY > 250 && index < bin.length - 1) {
         doc.addPage();
         startY = 20;
       }
     });
     
-    doc.save(`pool-cutlist-${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`bin-cutlist-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const downloadCutList = () => {
@@ -638,54 +638,54 @@ const BlindGenerator = () => {
           Technical Drawing System v1.0
         </p>
 
-        {/* Pool Management */}
+        {/* Bin Management */}
         <Card className="p-4 mb-6 bg-card border-border shadow-lg">
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
-              <Label htmlFor="poolName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
+              <Label htmlFor="binName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
                 Bin Name
               </Label>
               <Input
-                id="poolName"
+                id="binName"
                 type="text"
-                value={poolName}
-                onChange={(e) => setPoolName(e.target.value)}
+                value={binName}
+                onChange={(e) => setBinName(e.target.value)}
                 placeholder="Enter bin name..."
                 className="font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
               />
             </div>
             
             <Button
-              onClick={addToPool}
+              onClick={addToBin}
               className="font-mono uppercase tracking-wider"
               variant="default"
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add to Pool
+              Add to Bin
             </Button>
             
-            <Dialog open={showPoolDialog} onOpenChange={setShowPoolDialog}>
+            <Dialog open={showBinDialog} onOpenChange={setShowBinDialog}>
               <DialogTrigger asChild>
                 <Button
                   className="font-mono uppercase tracking-wider"
                   variant="outline"
-                  disabled={pool.length === 0}
+                  disabled={bin.length === 0}
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  View Pool ({pool.length})
+                  View Bin ({bin.length})
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="font-mono uppercase tracking-wider">Frame Pool</DialogTitle>
+                  <DialogTitle className="font-mono uppercase tracking-wider">Frame Bin</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  {pool.map((frame, index) => (
+                  {bin.map((frame, index) => (
                     <Card key={index} className="p-4 bg-secondary">
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-mono font-semibold text-lg">{frame.name}</h3>
                         <Button
-                          onClick={() => setPool(pool.filter((_, i) => i !== index))}
+                          onClick={() => setBin(bin.filter((_, i) => i !== index))}
                           variant="ghost"
                           size="sm"
                         >
@@ -710,23 +710,23 @@ const BlindGenerator = () => {
             </Dialog>
             
             <Button
-              onClick={exportPool}
+              onClick={exportBin}
               className="font-mono uppercase tracking-wider"
               variant="outline"
-              disabled={pool.length === 0}
+              disabled={bin.length === 0}
             >
               <FileDown className="mr-2 h-4 w-4" />
-              Export Pool
+              Export Bin
             </Button>
             
             <Button
-              onClick={clearPool}
+              onClick={clearBin}
               className="font-mono uppercase tracking-wider"
               variant="destructive"
-              disabled={pool.length === 0}
+              disabled={bin.length === 0}
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Clear Pool
+              Clear Bin
             </Button>
           </div>
         </Card>
