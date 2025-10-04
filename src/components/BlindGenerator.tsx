@@ -686,7 +686,7 @@ const BlindGenerator = () => {
               </div>
             </Card>
 
-            <Card className="p-6 bg-card border-border shadow-lg">
+            <Card className="p-6 bg-card border-border shadow-lg opacity-50 pointer-events-none" style={coveringMaterial === "plywood" ? {} : { opacity: 1, pointerEvents: 'auto' }}>
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
                 SUPPORT SPACING
               </h2>
@@ -706,6 +706,7 @@ const BlindGenerator = () => {
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
                       min={400}
                       max={640}
+                      disabled={coveringMaterial === "plywood"}
                     />
                   </div>
                   <Slider
@@ -715,6 +716,7 @@ const BlindGenerator = () => {
                     max={640}
                     step={10}
                     className="w-full"
+                    disabled={coveringMaterial === "plywood"}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>400mm</span>
