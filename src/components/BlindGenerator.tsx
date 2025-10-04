@@ -25,6 +25,12 @@ const BlindGenerator = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (coveringMaterial === "plywood") {
+      setSupportSpacing(1220);
+    }
+  }, [coveringMaterial]);
+
+  useEffect(() => {
     drawBlinds();
   }, [width, height, slatWidth, slatDepth, supportSpacing, divisionSize, selectedSupport, showCovering, showHorizontalSpacers, showInnerSize]);
 
