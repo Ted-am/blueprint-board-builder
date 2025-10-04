@@ -540,13 +540,7 @@ const BlindGenerator = () => {
               </div>
               
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">Cut Lists</h3>
-                  <Button onClick={downloadCutList} size="sm" className="gap-2">
-                    <Download className="w-4 h-4" />
-                    Download CutList
-                  </Button>
-                </div>
+                <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">Cut Lists</h3>
                 
                 {/* Board Cut List */}
                 <div className="space-y-2">
