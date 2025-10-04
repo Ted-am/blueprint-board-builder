@@ -6,9 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Download, Plus, Eye, Trash2, FileDown } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+
+interface FrameData {
+  name: string;
+  width: number;
+  height: number;
+  slatWidth: number;
+  slatDepth: number;
+  supportSpacing: number;
+  coveringMaterial: string;
+  plywoodThickness: number;
+}
 
 const BlindGenerator = () => {
   const [width, setWidth] = useState(500); // mm
@@ -22,6 +34,11 @@ const BlindGenerator = () => {
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Pool management state
+  const [poolName, setPoolName] = useState("");
+  const [pool, setPool] = useState<FrameData[]>([]);
+  const [showPoolDialog, setShowPoolDialog] = useState(false);
 
   useEffect(() => {
     if (coveringMaterial === "plywood") {
@@ -38,6 +55,122 @@ const BlindGenerator = () => {
   useEffect(() => {
     drawBlinds();
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers]);
+
+  const addToPool = () => {
+    if (!poolName.trim()) {
+      alert("Please enter a name for the frame");
+      return;
+    }
+    
+    const newFrame: FrameData = {
+      name: poolName,
+      width,
+      height,
+      slatWidth,
+      slatDepth,
+      supportSpacing,
+      coveringMaterial,
+      plywoodThickness,
+    };
+    
+    setPool([...pool, newFrame]);
+    setPoolName("");
+  };
+  
+  const clearPool = () => {
+    if (confirm("Are you sure you want to clear the pool?")) {
+      setPool([]);
+    }
+  };
+  
+  const exportPool = () => {
+    if (pool.length === 0) {
+      alert("Pool is empty");
+      return;
+    }
+    
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Pool Cut List", 14, 20);
+    
+    doc.setFontSize(12);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`Total Frames: ${pool.length}`, 14, 37);
+    
+    let startY = 50;
+    
+    pool.forEach((frame, index) => {
+      // Frame header
+      doc.setFontSize(14);
+      doc.text(`Frame ${index + 1}: ${frame.name}`, 14, startY);
+      doc.setFontSize(10);
+      doc.text(`${frame.width/10}cm × ${frame.height/10}cm`, 14, startY + 5);
+      
+      // Board Cut List
+      const verticalWidth = frame.height - 2 * frame.slatDepth;
+      const verticalHeight = frame.slatWidth;
+      const horizontalWidth = frame.width - 2 * frame.slatDepth;
+      const horizontalHeight = frame.slatWidth;
+      const additionalHorizontals = frame.height > frame.supportSpacing ? Math.floor((frame.height - 2 * frame.slatDepth) / frame.supportSpacing) : 0;
+      
+      const boardTableData = [
+        [verticalWidth/10, verticalHeight/10, frame.slatDepth/10, 2],
+        [horizontalWidth/10, horizontalHeight/10, frame.slatDepth/10, 2 + additionalHorizontals],
+      ];
+      
+      autoTable(doc, {
+        startY: startY + 10,
+        head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Qty"]],
+        body: boardTableData,
+        theme: "grid",
+        headStyles: { fillColor: [41, 128, 185] },
+        margin: { left: 14 },
+      });
+      
+      // Plywood or Fabric Cut List
+      if (frame.coveringMaterial === "plywood") {
+        const plywoodTableData: any[] = [];
+        
+        if (frame.width < 122) {
+          const standardPlatesQty = Math.floor(frame.height / 2440);
+          const remainingHeight = frame.height % 2440;
+          
+          if (standardPlatesQty > 0) {
+            plywoodTableData.push([frame.width/10, 2440/10, frame.plywoodThickness/10, standardPlatesQty]);
+          }
+          
+          if (remainingHeight > 0) {
+            plywoodTableData.push([frame.width/10, remainingHeight/10, frame.plywoodThickness/10, 1]);
+          }
+        } else {
+          const plywoodWidth = frame.width;
+          const plywoodHeight = frame.supportSpacing - frame.slatDepth;
+          const plywoodQty = 1 + additionalHorizontals;
+          plywoodTableData.push([plywoodWidth/10, plywoodHeight/10, frame.plywoodThickness/10, plywoodQty]);
+        }
+        
+        autoTable(doc, {
+          startY: (doc as any).lastAutoTable.finalY + 5,
+          head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Qty"]],
+          body: plywoodTableData,
+          theme: "grid",
+          headStyles: { fillColor: [76, 175, 80] },
+          margin: { left: 14 },
+        });
+      }
+      
+      startY = (doc as any).lastAutoTable.finalY + 15;
+      
+      // Add new page if needed
+      if (startY > 250 && index < pool.length - 1) {
+        doc.addPage();
+        startY = 20;
+      }
+    });
+    
+    doc.save(`pool-cutlist-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
 
   const downloadCutList = () => {
     const doc = new jsPDF();
@@ -504,6 +637,99 @@ const BlindGenerator = () => {
         <p className="text-muted-foreground mb-8 font-mono uppercase tracking-wide text-sm">
           Technical Drawing System v1.0
         </p>
+
+        {/* Pool Management */}
+        <Card className="p-4 mb-6 bg-card border-border shadow-lg">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="poolName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
+                Frame Name
+              </Label>
+              <Input
+                id="poolName"
+                type="text"
+                value={poolName}
+                onChange={(e) => setPoolName(e.target.value)}
+                placeholder="Enter frame name..."
+                className="font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+              />
+            </div>
+            
+            <Button
+              onClick={addToPool}
+              className="font-mono uppercase tracking-wider"
+              variant="default"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add to Pool
+            </Button>
+            
+            <Dialog open={showPoolDialog} onOpenChange={setShowPoolDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  className="font-mono uppercase tracking-wider"
+                  variant="outline"
+                  disabled={pool.length === 0}
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Pool ({pool.length})
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="font-mono uppercase tracking-wider">Frame Pool</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {pool.map((frame, index) => (
+                    <Card key={index} className="p-4 bg-secondary">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-mono font-semibold text-lg">{frame.name}</h3>
+                        <Button
+                          onClick={() => setPool(pool.filter((_, i) => i !== index))}
+                          variant="ghost"
+                          size="sm"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm font-mono">
+                        <div>Width: {frame.width/10}cm</div>
+                        <div>Height: {frame.height/10}cm</div>
+                        <div>Board Width: {frame.slatWidth/10}cm</div>
+                        <div>Board Depth: {frame.slatDepth/10}cm</div>
+                        <div>Support Spacing: {frame.supportSpacing/10}cm</div>
+                        <div>Material: {frame.coveringMaterial}</div>
+                        {frame.coveringMaterial === "plywood" && (
+                          <div>Plywood: {frame.plywoodThickness}mm</div>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <Button
+              onClick={exportPool}
+              className="font-mono uppercase tracking-wider"
+              variant="outline"
+              disabled={pool.length === 0}
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Export Pool
+            </Button>
+            
+            <Button
+              onClick={clearPool}
+              className="font-mono uppercase tracking-wider"
+              variant="destructive"
+              disabled={pool.length === 0}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Clear Pool
+            </Button>
+          </div>
+        </Card>
 
         <div className="grid lg:grid-cols-[300px_1fr_400px] gap-8">
           {/* Left Panel - Frame Covering & Support Spacing */}
