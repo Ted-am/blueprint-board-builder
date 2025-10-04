@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -18,6 +19,7 @@ const BlindGenerator = () => {
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
+  const [coveringMaterial, setCoveringMaterial] = useState<string>("fabric"); // covering material type
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const [showInnerSize, setShowInnerSize] = useState(false); // show inner size
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -437,6 +439,21 @@ const BlindGenerator = () => {
                   >
                     Show covering
                   </Label>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="coveringMaterial" className="text-sm font-mono uppercase tracking-wider">
+                    Material
+                  </Label>
+                  <Select value={coveringMaterial} onValueChange={setCoveringMaterial}>
+                    <SelectTrigger id="coveringMaterial" className="w-full">
+                      <SelectValue placeholder="Select material" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card z-50">
+                      <SelectItem value="fabric">Fabric</SelectItem>
+                      <SelectItem value="plywood">Plywood</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </Card>
