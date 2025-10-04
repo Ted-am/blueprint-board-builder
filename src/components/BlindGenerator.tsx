@@ -18,6 +18,7 @@ const BlindGenerator = () => {
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
+  const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -441,6 +442,21 @@ const BlindGenerator = () => {
             <h2 className="text-xl font-semibold mb-4 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
               PREVIEW
             </h2>
+            
+            <div className="mb-4 flex items-center space-x-3">
+              <Checkbox
+                id="showHorizontalSpacers"
+                checked={showHorizontalSpacers}
+                onCheckedChange={(checked) => setShowHorizontalSpacers(checked as boolean)}
+              />
+              <Label
+                htmlFor="showHorizontalSpacers"
+                className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+              >
+                Show horizontal spacers
+              </Label>
+            </div>
+            
             <canvas
               ref={canvasRef}
               width={800}
