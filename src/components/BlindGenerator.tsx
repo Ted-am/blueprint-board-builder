@@ -381,11 +381,11 @@ const BlindGenerator = () => {
     if (showCovering && coveringMaterial === "plywood") {
       ctx.shadowBlur = 0;
       
-      // Frame boundaries
-      const frameTop = offsetY + scaledDepth;
-      const frameBottom = offsetY + scaledHeight - scaledDepth;
-      const frameLeft = offsetX + scaledDepth;
-      const frameRight = offsetX + scaledWidth - scaledDepth;
+      // Frame boundaries - cover the entire frame
+      const frameTop = offsetY;
+      const frameBottom = offsetY + scaledHeight;
+      const frameLeft = offsetX;
+      const frameRight = offsetX + scaledWidth;
       
       // Draw plywood panels between horizontal supports
       for (let i = 0; i <= additionalHorizontals; i++) {
