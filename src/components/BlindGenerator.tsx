@@ -19,6 +19,7 @@ const BlindGenerator = () => {
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
   const [coveringMaterial, setCoveringMaterial] = useState<string>("plywood"); // covering material type
+  const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -89,7 +90,7 @@ const BlindGenerator = () => {
       doc.text("Plywood Cut List", 14, finalY + 10);
       
       const plywoodTableData = [
-        [plywoodWidth/10, plywoodHeight/10, 0.6, plywoodQty],
+        [plywoodWidth/10, plywoodHeight/10, plywoodThickness/10, plywoodQty],
       ];
       
       autoTable(doc, {
@@ -596,7 +597,7 @@ const BlindGenerator = () => {
                           <tr>
                             <td className="px-4 py-2 text-foreground">{width/10}</td>
                             <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
-                            <td className="px-4 py-2 text-foreground">0.6</td>
+                            <td className="px-4 py-2 text-foreground">{plywoodThickness/10}</td>
                             <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                           </tr>
                         </tbody>
@@ -772,6 +773,46 @@ const BlindGenerator = () => {
                 </div>
               </div>
             </Card>
+
+            {coveringMaterial === "plywood" && (
+              <Card className="p-6 bg-card border-border shadow-lg">
+                <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
+                  PLYWOOD DIMENSIONS
+                </h2>
+
+                <div className="space-y-6">
+                  {/* Plywood Thickness Control */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="plywoodThickness" className="text-sm font-mono uppercase tracking-wider">
+                        Thickness (mm)
+                      </Label>
+                      <Input
+                        id="plywoodThickness"
+                        type="number"
+                        value={plywoodThickness}
+                        onChange={(e) => setPlywoodThickness(Number(e.target.value))}
+                        className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+                        min={3}
+                        max={25}
+                      />
+                    </div>
+                    <Slider
+                      value={[plywoodThickness]}
+                      onValueChange={(value) => setPlywoodThickness(value[0])}
+                      min={3}
+                      max={25}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                      <span>3mm</span>
+                      <span>25mm</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
 
           </div>
         </div>
