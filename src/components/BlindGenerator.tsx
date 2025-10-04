@@ -702,36 +702,6 @@ const BlindGenerator = () => {
                     <span>400cm</span>
                   </div>
                 </div>
-
-                {/* Slat Depth Control */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="slatDepth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Depth (cm)
-                    </Label>
-                    <Input
-                      id="slatDepth"
-                      type="number"
-                      value={slatDepth}
-                      onChange={(e) => setSlatDepth(Number(e.target.value))}
-                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={16}
-                      max={25}
-                    />
-                  </div>
-                  <Slider
-                    value={[slatDepth]}
-                    onValueChange={(value) => setSlatDepth(value[0])}
-                    min={16}
-                    max={25}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>1.6cm</span>
-                    <span>2.5cm</span>
-                  </div>
-                </div>
               </div>
             </Card>
 
@@ -768,6 +738,36 @@ const BlindGenerator = () => {
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
                     <span>2cm</span>
                     <span>10cm</span>
+                  </div>
+                </div>
+
+                {/* Slat Depth Control */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="slatDepth" className="text-sm font-mono uppercase tracking-wider">
+                      Board Depth (cm)
+                    </Label>
+                    <Input
+                      id="slatDepth"
+                      type="number"
+                      value={slatDepth}
+                      onChange={(e) => setSlatDepth(Number(e.target.value))}
+                      className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
+                      min={16}
+                      max={25}
+                    />
+                  </div>
+                  <Slider
+                    value={[slatDepth]}
+                    onValueChange={(value) => setSlatDepth(value[0])}
+                    min={16}
+                    max={25}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-mono">
+                    <span>1.6cm</span>
+                    <span>2.5cm</span>
                   </div>
                 </div>
               </div>
