@@ -127,7 +127,7 @@ const BlindGenerator = () => {
     const scaledWidth = width * scale;
     const scaledHeight = height * scale;
     const offsetX = (canvas.width - scaledWidth) / 2;
-    const offsetY = (canvas.height - scaledHeight) / 2 + 30;
+    const offsetY = (canvas.height - scaledHeight) / 2 + 15;
 
     // Draw frame as separate rectangles with depth
     const scaledDepth = slatDepth * scale;
