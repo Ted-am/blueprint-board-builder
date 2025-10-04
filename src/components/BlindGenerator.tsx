@@ -250,13 +250,6 @@ const BlindGenerator = () => {
         ctx.rotate(-Math.PI / 2);
         ctx.fillText(`${supportSpacing}mm`, 0, 0);
         ctx.restore();
-        
-        // Draw Board Depth text (rotated 90 degrees from spacing text)
-        ctx.save();
-        ctx.translate(arrowX + 45, (startY + currentSupportY) / 2);
-        ctx.rotate(Math.PI / 2);
-        ctx.fillText(`Board: ${slatDepth}mm`, 0, 0);
-        ctx.restore();
       }
       
       // Draw dimension arrow for the last segment (from last support to bottom)
@@ -304,13 +297,6 @@ const BlindGenerator = () => {
         ctx.translate(arrowX + 25, (lastSupportY + bottomY) / 2);
         ctx.rotate(-Math.PI / 2);
         ctx.fillText(`${Math.round(lastSegmentDistance)}mm`, 0, 0);
-        ctx.restore();
-        
-        // Draw Board Depth text (rotated 90 degrees from spacing text)
-        ctx.save();
-        ctx.translate(arrowX + 45, (lastSupportY + bottomY) / 2);
-        ctx.rotate(Math.PI / 2);
-        ctx.fillText(`Board: ${slatDepth}mm`, 0, 0);
         ctx.restore();
       }
     }
