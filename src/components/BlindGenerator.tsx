@@ -67,6 +67,14 @@ const BlindGenerator = () => {
       [horizontalWidth/10, horizontalHeight/10, slatDepth/10, 2 + additionalHorizontals],
     ];
     
+    // Add plywood cut list if plywood is selected
+    if (coveringMaterial === "plywood") {
+      const plywoodWidth = width - 2 * slatDepth;
+      const plywoodHeight = supportSpacing - slatDepth;
+      const plywoodQty = 1 + additionalHorizontals;
+      tableData.push([plywoodWidth/10, plywoodHeight/10, 0.6, plywoodQty]);
+    }
+    
     autoTable(doc, {
       startY: 50,
       head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
@@ -597,12 +605,20 @@ const BlindGenerator = () => {
                         <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
                         <td className="px-4 py-2 text-foreground">2</td>
                       </tr>
-                      <tr>
+                      <tr className={coveringMaterial === "plywood" ? "border-b border-border" : ""}>
                         <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
                         <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
                         <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
                         <td className="px-4 py-2 text-foreground">{2 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                       </tr>
+                      {coveringMaterial === "plywood" && (
+                        <tr>
+                          <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
+                          <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
+                          <td className="px-4 py-2 text-foreground">0.6</td>
+                          <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
