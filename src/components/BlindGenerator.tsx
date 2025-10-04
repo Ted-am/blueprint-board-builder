@@ -102,7 +102,7 @@ const BlindGenerator = () => {
     
     for (let i = 1; i <= additionalHorizontals; i++) {
       const baseY = offsetY + scaledDepth + (i * supportSpacing * scale);
-      const additionalOffset = (coveringMaterial === "plywood" && width > 1220) ? (i * scaledDepth) : 0;
+      const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * scaledDepth) : 0;
       const supportY = baseY + additionalOffset;
       const supportX = offsetX + scaledDepth;
       const supportWidth = scaledWidth - 2 * scaledDepth;
@@ -193,7 +193,7 @@ const BlindGenerator = () => {
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     for (let i = 1; i <= additionalHorizontals; i++) {
       const baseY = offsetY + scaledDepth + (i * supportSpacing * scale);
-      const additionalOffset = (coveringMaterial === "plywood" && width > 1220) ? (i * slatDepth * scale) : 0;
+      const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
       const supportY = baseY + additionalOffset;
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
       
@@ -223,11 +223,11 @@ const BlindGenerator = () => {
       const prevSupportY = offsetY + scaledDepth;
       for (let i = 1; i <= additionalHorizontals; i++) {
         const baseY = offsetY + scaledDepth + (i * supportSpacing * scale);
-        const additionalOffset = (coveringMaterial === "plywood" && width > 1220) ? (i * slatDepth * scale) : 0;
+        const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
         const currentSupportY = baseY + additionalOffset;
         const arrowX = offsetX + scaledWidth + 30;
         const prevBaseY = offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
-        const prevAdditionalOffset = (coveringMaterial === "plywood" && width > 1220) ? ((i - 1) * slatDepth * scale) : 0;
+        const prevAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
         const startY = i === 1 ? prevSupportY : prevBaseY + prevAdditionalOffset;
         
         // Draw vertical line
@@ -275,7 +275,7 @@ const BlindGenerator = () => {
       // Draw dimension arrow for the last segment (from last support to bottom)
       if (additionalHorizontals > 0) {
         const lastBaseY = offsetY + scaledDepth + (additionalHorizontals * supportSpacing * scale);
-        const lastAdditionalOffset = (coveringMaterial === "plywood" && width > 1220) ? (additionalHorizontals * slatDepth * scale) : 0;
+        const lastAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && additionalHorizontals > 1) ? (additionalHorizontals * slatDepth * scale) : 0;
         const lastSupportY = lastBaseY + lastAdditionalOffset;
         const bottomY = offsetY + scaledHeight - scaledDepth;
         const lastSegmentDistance = height - scaledDepth / scale - (additionalHorizontals * supportSpacing) - slatDepth;
