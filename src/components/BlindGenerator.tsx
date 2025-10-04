@@ -499,7 +499,7 @@ const BlindGenerator = () => {
               ref={canvasRef}
               width={800}
               height={600}
-              className="w-full h-auto border border-border rounded bg-transparent cursor-pointer"
+              className="w-full h-auto border border-border rounded bg-transparent"
               onClick={handleCanvasClick}
             />
             <div className="mt-4 space-y-4">
