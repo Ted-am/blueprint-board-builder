@@ -27,9 +27,9 @@ const BlindGenerator = () => {
   useEffect(() => {
     if (coveringMaterial === "plywood") {
       if (width > 1220) {
-        setSupportSpacing(2440 - (slatDepth / 2));
+        setSupportSpacing(2440 - (slatDepth / 2) - slatDepth);
       } else {
-        setSupportSpacing(1220 - (slatDepth / 2));
+        setSupportSpacing(1220 - (slatDepth / 2) - slatDepth);
       }
     } else if (coveringMaterial === "fabric") {
       setSupportSpacing(500);
