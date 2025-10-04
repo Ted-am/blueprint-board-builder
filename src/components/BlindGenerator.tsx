@@ -643,14 +643,14 @@ const BlindGenerator = () => {
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
               <Label htmlFor="poolName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
-                Frame Name
+                Bin Name
               </Label>
               <Input
                 id="poolName"
                 type="text"
                 value={poolName}
                 onChange={(e) => setPoolName(e.target.value)}
-                placeholder="Enter frame name..."
+                placeholder="Enter bin name..."
                 className="font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
               />
             </div>
