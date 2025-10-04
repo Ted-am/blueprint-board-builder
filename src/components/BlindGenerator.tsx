@@ -421,7 +421,7 @@ const BlindGenerator = () => {
           <div className="space-y-6">
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                ПОКРЫТИЕ РАМЫ
+                FRAME COVERING
               </h2>
 
               <div className="space-y-6">
@@ -435,7 +435,7 @@ const BlindGenerator = () => {
                     htmlFor="showCovering"
                     className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                   >
-                    Показать покрытие
+                    Show covering
                   </Label>
                 </div>
               </div>
