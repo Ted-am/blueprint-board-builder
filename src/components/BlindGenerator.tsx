@@ -40,6 +40,22 @@ const BlindGenerator = () => {
   const [bin, setBin] = useState<FrameData[]>([]);
   const [showBinDialog, setShowBinDialog] = useState(false);
 
+  // Update all frame names in bin when binName changes
+  useEffect(() => {
+    if (bin.length > 0 && binName.trim()) {
+      setBin(bin.map(frame => {
+        // Extract height and width from the old name or use frame dimensions
+        const nameParts = frame.name.split('_');
+        const height = nameParts.length >= 2 ? nameParts[nameParts.length - 2] : frame.height;
+        const width = nameParts.length >= 3 ? nameParts[nameParts.length - 1] : frame.width;
+        return {
+          ...frame,
+          name: `${binName}_${height}_${width}`
+        };
+      }));
+    }
+  }, [binName]);
+
   useEffect(() => {
     if (coveringMaterial === "plywood") {
       if (width < 1220) {
@@ -58,12 +74,12 @@ const BlindGenerator = () => {
 
   const addToBin = () => {
     if (!binName.trim()) {
-      alert("Please enter a name for the frame");
+      alert("Please enter a bin name");
       return;
     }
     
     const newFrame: FrameData = {
-      name: binName,
+      name: `${binName}_${height}_${width}`,
       width,
       height,
       slatWidth,
@@ -74,12 +90,12 @@ const BlindGenerator = () => {
     };
     
     setBin([...bin, newFrame]);
-    setBinName("");
   };
   
   const clearBin = () => {
     if (confirm("Are you sure you want to clear the bin?")) {
       setBin([]);
+      setBinName("");
     }
   };
   
