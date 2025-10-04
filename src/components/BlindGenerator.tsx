@@ -264,6 +264,54 @@ const BlindGenerator = () => {
       ctx.strokeRect(offsetX + scaledDepth, supportY, scaledWidth - 2 * scaledDepth, scaledDepth);
     }
 
+    // Draw plywood covering with random semi-transparent colors
+    if (showCovering && coveringMaterial === "plywood") {
+      ctx.shadowBlur = 0;
+      
+      // Draw plywood panels between horizontal supports
+      for (let i = 0; i <= additionalHorizontals; i++) {
+        // Generate random color
+        const hue = Math.floor(Math.random() * 360);
+        const saturation = Math.floor(Math.random() * 30) + 20; // 20-50%
+        const lightness = Math.floor(Math.random() * 30) + 40; // 40-70%
+        
+        ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+        
+        // Calculate panel position
+        let panelY, panelHeight;
+        if (i === 0) {
+          // First panel (top to first support)
+          panelY = offsetY + scaledDepth;
+          panelHeight = supportSpacing * scale;
+        } else {
+          // Subsequent panels
+          const prevBaseY = offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
+          const prevAdditionalOffset = (width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
+          panelY = prevBaseY + prevAdditionalOffset + scaledDepth;
+          
+          if (i === additionalHorizontals) {
+            // Last panel (last support to bottom)
+            panelHeight = (offsetY + scaledHeight - scaledDepth) - panelY;
+          } else {
+            // Middle panels
+            const currentBaseY = offsetY + scaledDepth + (i * supportSpacing * scale);
+            const currentAdditionalOffset = (width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
+            panelHeight = (currentBaseY + currentAdditionalOffset) - panelY;
+          }
+        }
+        
+        // Draw the plywood panel
+        ctx.fillRect(
+          offsetX + scaledDepth,
+          panelY,
+          scaledWidth - 2 * scaledDepth,
+          panelHeight
+        );
+      }
+      
+      ctx.shadowBlur = 10;
+    }
+
     // Draw dimension arrows between horizontal supports
     if (showHorizontalSpacers) {
       ctx.setLineDash([5, 5]);
