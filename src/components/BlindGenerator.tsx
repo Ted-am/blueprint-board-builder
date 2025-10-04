@@ -238,7 +238,7 @@ const BlindGenerator = () => {
         
         // Draw dimension text
         ctx.fillStyle = "hsl(0, 0%, 100%)";
-        ctx.font = "12px monospace";
+        ctx.font = "16px monospace";
         ctx.textAlign = "center";
         ctx.shadowBlur = 15;
         
@@ -286,7 +286,7 @@ const BlindGenerator = () => {
         
         // Draw dimension text
         ctx.fillStyle = "hsl(0, 0%, 100%)";
-        ctx.font = "12px monospace";
+        ctx.font = "16px monospace";
         ctx.textAlign = "center";
         ctx.shadowBlur = 15;
         
@@ -354,7 +354,7 @@ const BlindGenerator = () => {
         
         // Draw dimension text
         ctx.fillStyle = "hsl(0, 0%, 100%)";
-        ctx.font = "12px monospace";
+        ctx.font = "16px monospace";
         ctx.textAlign = "center";
         ctx.shadowBlur = 15;
         
@@ -389,7 +389,7 @@ const BlindGenerator = () => {
 
     // Draw dimension text
     ctx.fillStyle = "hsl(0, 0%, 100%)";
-    ctx.font = "12px monospace";
+    ctx.font = "16px monospace";
     ctx.textAlign = "center";
     ctx.shadowBlur = 15;
     ctx.fillText(`${width}mm`, offsetX + scaledWidth / 2, offsetY - 25);
