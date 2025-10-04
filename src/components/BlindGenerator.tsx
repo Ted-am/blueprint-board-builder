@@ -19,7 +19,7 @@ const BlindGenerator = () => {
   const [divisionSize, setDivisionSize] = useState(1220); // mm internal division marks
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
-  const [coveringMaterial, setCoveringMaterial] = useState<string>("fabric"); // covering material type
+  const [coveringMaterial, setCoveringMaterial] = useState<string>("plywood"); // covering material type
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const [showInnerSize, setShowInnerSize] = useState(false); // show inner size
   const canvasRef = useRef<HTMLCanvasElement>(null);
