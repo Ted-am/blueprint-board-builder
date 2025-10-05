@@ -204,7 +204,7 @@ const BlindGenerator = () => {
     
     doc.setFontSize(12);
     doc.text(`Frame: ${width/10}cm × ${height/10}cm`, 14, 30);
-    doc.text(`Board Depth: ${slatDepth/10}cm`, 14, 37);
+    doc.text(`Board Depth: ${slatDepth}mm`, 14, 37);
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 44);
     
     // Vertical boards - rotate so longer side is width
