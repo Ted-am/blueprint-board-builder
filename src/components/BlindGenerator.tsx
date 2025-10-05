@@ -132,7 +132,7 @@ const BlindGenerator = () => {
       doc.text(`${frame.width/10}cm × ${frame.height/10}cm`, 14, startY + 5);
       
       // Board Cut List
-      const verticalWidth = frame.height - 2 * frame.slatDepth;
+      const verticalWidth = frame.height;
       const verticalHeight = frame.slatWidth;
       const horizontalWidth = frame.width - 2 * frame.slatDepth;
       const horizontalHeight = frame.slatWidth;
@@ -208,7 +208,7 @@ const BlindGenerator = () => {
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 44);
     
     // Vertical boards - rotate so longer side is width
-    const verticalWidth = height - 2 * slatDepth;
+    const verticalWidth = height;
     const verticalHeight = slatWidth;
     
     // Horizontal boards - rotate so longer side is width
@@ -891,7 +891,7 @@ const BlindGenerator = () => {
                       </thead>
                       <tbody>
                         <tr className="border-b border-border">
-                          <td className="px-4 py-2 text-foreground">{(height - 2 * slatDepth)/10}</td>
+                          <td className="px-4 py-2 text-foreground">{height/10}</td>
                           <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
                           <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
                           <td className="px-4 py-2 text-foreground">2</td>
