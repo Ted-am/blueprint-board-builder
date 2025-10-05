@@ -1074,7 +1074,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="slatDepth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Depth (cm)
+                      Board Depth (mm)
                     </Label>
                     <Input
                       id="slatDepth"
@@ -1095,8 +1095,8 @@ const BlindGenerator = () => {
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground font-mono">
-                    <span>1.6cm</span>
-                    <span>2.5cm</span>
+                    <span>16mm</span>
+                    <span>25mm</span>
                   </div>
                 </div>
               </div>
