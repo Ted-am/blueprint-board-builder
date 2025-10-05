@@ -883,8 +883,8 @@ const BlindGenerator = () => {
                     <table className="w-full text-sm font-mono">
                       <thead>
                         <tr className="bg-primary/10 border-b border-border">
-                          <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
                           <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
+                          <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
                           <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
                           <th className="px-4 py-2 text-left text-foreground">Quantity</th>
                         </tr>
