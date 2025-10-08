@@ -132,7 +132,6 @@ const BlindGenerator = () => {
   const [coveringMaterial, setCoveringMaterial] = useState<string>("plywood"); // covering material type
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
-  const [distributeHorizontalsEvenly, setDistributeHorizontalsEvenly] = useState(false); // distribute horizontals evenly for fabric
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Language state
@@ -182,7 +181,7 @@ const BlindGenerator = () => {
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers, distributeHorizontalsEvenly, coveringMaterial]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers, coveringMaterial]);
 
   const addToBin = () => {
     if (!binName.trim()) {
@@ -478,7 +477,7 @@ const BlindGenerator = () => {
     
     // Calculate effective spacing for click detection
     const availableHeight = height - 2 * slatDepth;
-    const effectiveSpacing = (distributeHorizontalsEvenly && coveringMaterial === "fabric" && additionalHorizontals > 0)
+    const effectiveSpacing = (coveringMaterial === "fabric" && additionalHorizontals > 0)
       ? availableHeight / (additionalHorizontals + 1)
       : supportSpacing;
     
@@ -576,7 +575,7 @@ const BlindGenerator = () => {
     
     // Calculate spacing: either even distribution or fixed spacing
     const availableHeight = height - 2 * slatDepth;
-    const effectiveSpacing = (distributeHorizontalsEvenly && coveringMaterial === "fabric" && additionalHorizontals > 0)
+    const effectiveSpacing = (coveringMaterial === "fabric" && additionalHorizontals > 0)
       ? availableHeight / (additionalHorizontals + 1)
       : supportSpacing;
     
@@ -672,7 +671,7 @@ const BlindGenerator = () => {
         const topY = offsetY + scaledDepth;
         const startY = lastSupportY + scaledDepth; // measure from bottom of last support
         const endY = topY; // to bottom of top frame
-        const lastSegmentDistance = (distributeHorizontalsEvenly && coveringMaterial === "fabric") 
+        const lastSegmentDistance = (coveringMaterial === "fabric") 
           ? effectiveSpacing - slatDepth 
           : (endY - startY) / scale;
         const arrowX = offsetX + scaledWidth + 30;
@@ -1064,21 +1063,6 @@ const BlindGenerator = () => {
                 </div>
 
                 {/* Distribute Evenly Checkbox - only for fabric */}
-                {coveringMaterial === "fabric" && (
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      id="distributeEvenly"
-                      checked={distributeHorizontalsEvenly}
-                      onCheckedChange={(checked) => setDistributeHorizontalsEvenly(checked as boolean)}
-                    />
-                    <Label
-                      htmlFor="distributeEvenly"
-                      className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-                    >
-                      {t.distributeEvenly}
-                    </Label>
-                  </div>
-                )}
               </div>
             </Card>
           </div>
@@ -1201,7 +1185,7 @@ const BlindGenerator = () => {
                             <td className="px-4 py-2 text-foreground">{(() => {
                               const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
                               const availableHeight = height - 2 * slatDepth;
-                              const effectiveSpacing = (distributeHorizontalsEvenly && additionalHorizontals > 0)
+                              const effectiveSpacing = (coveringMaterial === "fabric" && additionalHorizontals > 0)
                                 ? availableHeight / (additionalHorizontals + 1)
                                 : supportSpacing;
                               return ((effectiveSpacing - slatDepth)/10).toFixed(1);
