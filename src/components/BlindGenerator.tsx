@@ -509,28 +509,49 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       if (frame.coveringMaterial === "plywood") {
         const plywoodTableData: any[] = [];
         
-        // Check if frame fits in standard sheet (244cm x 122cm) with rotation
-        const fitsInSheet = (frame.width <= 1220 && frame.height <= 2440) || (frame.width <= 2440 && frame.height <= 1220);
+        // Standard sheet: 244cm x 122cm
+        const maxSheetHeight = 2440; // mm
+        const maxSheetWidth = 1220; // mm
+        
+        // Check if frame fits in standard sheet with rotation
+        const fitsInSheet = (frame.width <= maxSheetWidth && frame.height <= maxSheetHeight) || 
+                           (frame.width <= maxSheetHeight && frame.height <= maxSheetWidth);
         
         if (fitsInSheet) {
           // Single sheet - frame dimensions
           plywoodTableData.push([frame.height/10, frame.width/10, frame.plywoodThickness, 1 * count]);
+        } else if (frame.width <= maxSheetWidth && frame.height > maxSheetHeight) {
+          // Cut by height - multiple sheets stacked vertically
+          const fullSheets = Math.floor(frame.height / maxSheetHeight);
+          const remainder = frame.height % maxSheetHeight;
+          
+          if (fullSheets > 0) {
+            plywoodTableData.push([maxSheetHeight/10, frame.width/10, frame.plywoodThickness, fullSheets * count]);
+          }
+          if (remainder > 0) {
+            plywoodTableData.push([remainder/10, frame.width/10, frame.plywoodThickness, 1 * count]);
+          }
+        } else if (frame.height <= maxSheetHeight && frame.width > maxSheetWidth) {
+          // Cut by width - multiple sheets side by side
+          const fullSheets = Math.floor(frame.width / maxSheetWidth);
+          const remainder = frame.width % maxSheetWidth;
+          
+          if (fullSheets > 0) {
+            plywoodTableData.push([frame.height/10, maxSheetWidth/10, frame.plywoodThickness, fullSheets * count]);
+          }
+          if (remainder > 0) {
+            plywoodTableData.push([frame.height/10, remainder/10, frame.plywoodThickness, 1 * count]);
+          }
         } else {
-          // Multiple panels - each panel must fit in standard sheet
+          // Both dimensions too large - use panel logic based on supportSpacing
           const panelHeight = frame.supportSpacing - frame.slatDepth;
-          const panelWidth = frame.width;
           const panelQty = (1 + additionalHorizontals) * count;
           
-          // Check if panel fits in sheet, rotate if needed
-          if (panelWidth <= 1220 && panelHeight <= 2440) {
-            plywoodTableData.push([panelHeight/10, panelWidth/10, frame.plywoodThickness, panelQty]);
-          } else if (panelWidth <= 2440 && panelHeight <= 1220) {
-            plywoodTableData.push([panelHeight/10, panelWidth/10, frame.plywoodThickness, panelQty]);
+          if (frame.width <= maxSheetWidth) {
+            plywoodTableData.push([panelHeight/10, frame.width/10, frame.plywoodThickness, panelQty]);
           } else {
-            // Panel too large - split into sections of max 122cm width
-            const sectionsPerPanel = Math.ceil(panelWidth / 1220);
-            const sectionWidth = Math.min(panelWidth, 1220);
-            plywoodTableData.push([panelHeight/10, sectionWidth/10, frame.plywoodThickness, panelQty * sectionsPerPanel]);
+            const sectionsPerPanel = Math.ceil(frame.width / maxSheetWidth);
+            plywoodTableData.push([panelHeight/10, maxSheetWidth/10, frame.plywoodThickness, panelQty * sectionsPerPanel]);
           }
         }
         
@@ -601,28 +622,49 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     if (coveringMaterial === "plywood") {
       const plywoodTableData: any[] = [];
       
-      // Check if frame fits in standard sheet (244cm x 122cm) with rotation
-      const fitsInSheet = (width <= 1220 && height <= 2440) || (width <= 2440 && height <= 1220);
+      // Standard sheet: 244cm x 122cm
+      const maxSheetHeight = 2440; // mm
+      const maxSheetWidth = 1220; // mm
+      
+      // Check if frame fits in standard sheet with rotation
+      const fitsInSheet = (width <= maxSheetWidth && height <= maxSheetHeight) || 
+                         (width <= maxSheetHeight && height <= maxSheetWidth);
       
       if (fitsInSheet) {
         // Single sheet - frame dimensions
         plywoodTableData.push([height/10, width/10, plywoodThickness, 1]);
+      } else if (width <= maxSheetWidth && height > maxSheetHeight) {
+        // Cut by height - multiple sheets stacked vertically
+        const fullSheets = Math.floor(height / maxSheetHeight);
+        const remainder = height % maxSheetHeight;
+        
+        if (fullSheets > 0) {
+          plywoodTableData.push([maxSheetHeight/10, width/10, plywoodThickness, fullSheets]);
+        }
+        if (remainder > 0) {
+          plywoodTableData.push([remainder/10, width/10, plywoodThickness, 1]);
+        }
+      } else if (height <= maxSheetHeight && width > maxSheetWidth) {
+        // Cut by width - multiple sheets side by side
+        const fullSheets = Math.floor(width / maxSheetWidth);
+        const remainder = width % maxSheetWidth;
+        
+        if (fullSheets > 0) {
+          plywoodTableData.push([height/10, maxSheetWidth/10, plywoodThickness, fullSheets]);
+        }
+        if (remainder > 0) {
+          plywoodTableData.push([height/10, remainder/10, plywoodThickness, 1]);
+        }
       } else {
-        // Multiple panels - each panel must fit in standard sheet
+        // Both dimensions too large - use panel logic based on supportSpacing
         const panelHeight = supportSpacing - slatDepth;
-        const panelWidth = width;
         const panelQty = 1 + additionalHorizontals;
         
-        // Check if panel fits in sheet, rotate if needed
-        if (panelWidth <= 1220 && panelHeight <= 2440) {
-          plywoodTableData.push([panelHeight/10, panelWidth/10, plywoodThickness, panelQty]);
-        } else if (panelWidth <= 2440 && panelHeight <= 1220) {
-          plywoodTableData.push([panelHeight/10, panelWidth/10, plywoodThickness, panelQty]);
+        if (width <= maxSheetWidth) {
+          plywoodTableData.push([panelHeight/10, width/10, plywoodThickness, panelQty]);
         } else {
-          // Panel too large - split into sections of max 122cm width
-          const sectionsPerPanel = Math.ceil(panelWidth / 1220);
-          const sectionWidth = Math.min(panelWidth, 1220);
-          plywoodTableData.push([panelHeight/10, sectionWidth/10, plywoodThickness, panelQty * sectionsPerPanel]);
+          const sectionsPerPanel = Math.ceil(width / maxSheetWidth);
+          plywoodTableData.push([panelHeight/10, maxSheetWidth/10, plywoodThickness, panelQty * sectionsPerPanel]);
         }
       }
       
@@ -1477,7 +1519,10 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                         </thead>
                         <tbody>
                           {(() => {
-                            const fitsInSheet = (width <= 1220 && height <= 2440) || (width <= 2440 && height <= 1220);
+                            const maxSheetHeight = 2440;
+                            const maxSheetWidth = 1220;
+                            const fitsInSheet = (width <= maxSheetWidth && height <= maxSheetHeight) || 
+                                               (width <= maxSheetHeight && height <= maxSheetWidth);
                             
                             if (fitsInSheet) {
                               return (
@@ -1488,36 +1533,77 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                                   <td className="px-4 py-2 text-foreground">1</td>
                                 </tr>
                               );
-                            } else {
-                              const panelHeight = supportSpacing - slatDepth;
-                              const panelWidth = width;
-                              const panelQty = 1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0);
+                            } else if (width <= maxSheetWidth && height > maxSheetHeight) {
+                              const fullSheets = Math.floor(height / maxSheetHeight);
+                              const remainder = height % maxSheetHeight;
+                              const rows = [];
                               
-                              if (panelWidth <= 1220 && panelHeight <= 2440) {
-                                return (
-                                  <tr>
-                                    <td className="px-4 py-2 text-foreground">{panelHeight/10}</td>
-                                    <td className="px-4 py-2 text-foreground">{panelWidth/10}</td>
+                              if (fullSheets > 0) {
+                                rows.push(
+                                  <tr key="full">
+                                    <td className="px-4 py-2 text-foreground">{maxSheetHeight/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{width/10}</td>
                                     <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
-                                    <td className="px-4 py-2 text-foreground">{panelQty}</td>
+                                    <td className="px-4 py-2 text-foreground">{fullSheets}</td>
                                   </tr>
                                 );
-                              } else if (panelWidth <= 2440 && panelHeight <= 1220) {
+                              }
+                              if (remainder > 0) {
+                                rows.push(
+                                  <tr key="remainder">
+                                    <td className="px-4 py-2 text-foreground">{remainder/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{width/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                    <td className="px-4 py-2 text-foreground">1</td>
+                                  </tr>
+                                );
+                              }
+                              return rows;
+                            } else if (height <= maxSheetHeight && width > maxSheetWidth) {
+                              const fullSheets = Math.floor(width / maxSheetWidth);
+                              const remainder = width % maxSheetWidth;
+                              const rows = [];
+                              
+                              if (fullSheets > 0) {
+                                rows.push(
+                                  <tr key="full">
+                                    <td className="px-4 py-2 text-foreground">{height/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{maxSheetWidth/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                    <td className="px-4 py-2 text-foreground">{fullSheets}</td>
+                                  </tr>
+                                );
+                              }
+                              if (remainder > 0) {
+                                rows.push(
+                                  <tr key="remainder">
+                                    <td className="px-4 py-2 text-foreground">{height/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{remainder/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                    <td className="px-4 py-2 text-foreground">1</td>
+                                  </tr>
+                                );
+                              }
+                              return rows;
+                            } else {
+                              const panelHeight = supportSpacing - slatDepth;
+                              const panelQty = 1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0);
+                              
+                              if (width <= maxSheetWidth) {
                                 return (
                                   <tr>
                                     <td className="px-4 py-2 text-foreground">{panelHeight/10}</td>
-                                    <td className="px-4 py-2 text-foreground">{panelWidth/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{width/10}</td>
                                     <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
                                     <td className="px-4 py-2 text-foreground">{panelQty}</td>
                                   </tr>
                                 );
                               } else {
-                                const sectionsPerPanel = Math.ceil(panelWidth / 1220);
-                                const sectionWidth = Math.min(panelWidth, 1220);
+                                const sectionsPerPanel = Math.ceil(width / maxSheetWidth);
                                 return (
                                   <tr>
                                     <td className="px-4 py-2 text-foreground">{panelHeight/10}</td>
-                                    <td className="px-4 py-2 text-foreground">{sectionWidth/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{maxSheetWidth/10}</td>
                                     <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
                                     <td className="px-4 py-2 text-foreground">{panelQty * sectionsPerPanel}</td>
                                   </tr>
