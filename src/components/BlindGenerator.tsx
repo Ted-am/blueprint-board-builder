@@ -121,7 +121,13 @@ const drawFrameSketch = (frame: FrameData): string => {
   return canvas.toDataURL('image/png');
 };
 
-const BlindGenerator = () => {
+interface BlindGeneratorProps {
+  initialData?: any;
+  onDataChange?: (data: any) => void;
+  onSave?: () => void;
+}
+
+const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorProps = {}) => {
   const [width, setWidth] = useState(500); // mm
   const [height, setHeight] = useState(2000); // mm
   const [slatWidth, setSlatWidth] = useState(25); // mm board width
@@ -142,6 +148,47 @@ const BlindGenerator = () => {
   const [binName, setBinName] = useState("");
   const [bin, setBin] = useState<FrameData[]>([]);
   const [showBinDialog, setShowBinDialog] = useState(false);
+
+  // Load initial data
+  useEffect(() => {
+    if (initialData) {
+      setWidth(initialData.width || 500);
+      setHeight(initialData.height || 2000);
+      setSlatWidth(initialData.slatWidth || 25);
+      setSlatDepth(initialData.slatDepth || 20);
+      setSupportSpacing(initialData.supportSpacing || 500);
+      setSelectedSupport(initialData.selectedSupport ?? null);
+      setShowCovering(initialData.showCovering || false);
+      setCoveringMaterial(initialData.coveringMaterial || "plywood");
+      setPlywoodThickness(initialData.plywoodThickness || 6);
+      setShowHorizontalSpacers(initialData.showHorizontalSpacers !== false);
+      setLanguage(initialData.language || 'en');
+      setBinName(initialData.binName || "");
+      setBin(initialData.bin || []);
+    }
+  }, []);
+
+  // Auto-save state changes
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({
+        width,
+        height,
+        slatWidth,
+        slatDepth,
+        supportSpacing,
+        selectedSupport,
+        showCovering,
+        coveringMaterial,
+        plywoodThickness,
+        showHorizontalSpacers,
+        language,
+        binName,
+        bin,
+      });
+    }
+  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, 
+      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, binName, bin]);
 
   // Update all frame names in bin when binName changes
   useEffect(() => {
@@ -832,7 +879,14 @@ const BlindGenerator = () => {
           <h1 className="text-4xl font-bold text-foreground tracking-wider" style={{ textShadow: "var(--glow)" }}>
             {t.title}
           </h1>
-          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+          <div className="flex items-center gap-4">
+            {onSave && (
+              <Button onClick={onSave} variant="outline">
+                Save
+              </Button>
+            )}
+            <LanguageSelector language={language} onLanguageChange={setLanguage} />
+          </div>
         </div>
         <p className="text-muted-foreground mb-8 font-mono uppercase tracking-wide text-sm">
           {t.subtitle}
