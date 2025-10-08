@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Download, Plus, Eye, Trash2, FileDown } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Language, getTranslation } from "@/lib/translations";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface FrameData {
   name: string;
@@ -133,6 +135,10 @@ const BlindGenerator = () => {
   const [distributeHorizontalsEvenly, setDistributeHorizontalsEvenly] = useState(false); // distribute horizontals evenly for fabric
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
+  // Language state
+  const [language, setLanguage] = useState<Language>('en');
+  const t = getTranslation(language);
+  
   // Bin management state
   const [binName, setBinName] = useState("");
   const [bin, setBin] = useState<FrameData[]>([]);
@@ -199,7 +205,7 @@ const BlindGenerator = () => {
   };
   
   const clearBin = () => {
-    if (confirm("Are you sure you want to clear the bin?")) {
+    if (confirm(t.areYouSure)) {
       setBin([]);
       setBinName("");
     }
@@ -207,7 +213,7 @@ const BlindGenerator = () => {
   
   const exportBin = () => {
     if (bin.length === 0) {
-      alert("Bin is empty");
+      alert(t.binEmpty);
       return;
     }
     
@@ -817,13 +823,16 @@ const BlindGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background bg-blueprint-grid bg-grid p-8">
+    <div className="min-h-screen bg-background bg-blueprint-grid bg-grid p-8" dir={language === 'he' ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-foreground mb-2 tracking-wider" style={{ textShadow: "var(--glow)" }}>
-          WOODEN BLIND GENERATOR
-        </h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-4xl font-bold text-foreground tracking-wider" style={{ textShadow: "var(--glow)" }}>
+            {t.title}
+          </h1>
+          <LanguageSelector language={language} onLanguageChange={setLanguage} />
+        </div>
         <p className="text-muted-foreground mb-8 font-mono uppercase tracking-wide text-sm">
-          Technical Drawing System v1.0
+          {t.subtitle}
         </p>
 
         {/* Bin Management */}
@@ -831,14 +840,14 @@ const BlindGenerator = () => {
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
               <Label htmlFor="binName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
-                Bin Name
+                {t.binName}
               </Label>
               <Input
                 id="binName"
                 type="text"
                 value={binName}
                 onChange={(e) => setBinName(e.target.value)}
-                placeholder="Enter bin name..."
+                placeholder={t.binNamePlaceholder}
                 className="font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
               />
             </div>
@@ -849,7 +858,7 @@ const BlindGenerator = () => {
               variant="default"
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add to Bin
+              {t.addToBin}
             </Button>
             
             <Dialog open={showBinDialog} onOpenChange={setShowBinDialog}>
@@ -860,13 +869,13 @@ const BlindGenerator = () => {
                   disabled={bin.length === 0}
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  View Bin ({bin.length})
+                  {t.viewBin} ({bin.length})
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="font-mono uppercase tracking-wider flex items-center justify-between">
-                    <span>Frame Bin</span>
+                    <span>{t.frameBin}</span>
                     <Button
                       onClick={exportBin}
                       className="font-mono uppercase tracking-wider"
@@ -874,7 +883,7 @@ const BlindGenerator = () => {
                       size="sm"
                     >
                       <FileDown className="mr-2 h-4 w-4" />
-                      Export Bin
+                      {t.exportBin}
                     </Button>
                   </DialogTitle>
                 </DialogHeader>
@@ -967,7 +976,7 @@ const BlindGenerator = () => {
               disabled={bin.length === 0}
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Clear Bin
+              {t.clearBin}
             </Button>
           </div>
         </Card>
@@ -977,21 +986,21 @@ const BlindGenerator = () => {
           <div className="space-y-6">
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                FRAME COVERING
+                {t.frameCovering}
               </h2>
 
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="coveringMaterial" className="text-sm font-mono uppercase tracking-wider">
-                    Material
+                    {t.material}
                   </Label>
                   <Select value={coveringMaterial} onValueChange={setCoveringMaterial}>
                     <SelectTrigger id="coveringMaterial" className="w-full">
-                      <SelectValue placeholder="Select material" />
+                      <SelectValue placeholder={t.selectMaterial} />
                     </SelectTrigger>
                     <SelectContent className="bg-card z-50">
-                      <SelectItem value="fabric">Fabric</SelectItem>
-                      <SelectItem value="plywood">Plywood</SelectItem>
+                      <SelectItem value="fabric">{t.fabric}</SelectItem>
+                      <SelectItem value="plywood">{t.plywood}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1006,7 +1015,7 @@ const BlindGenerator = () => {
                     htmlFor="showCovering"
                     className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                   >
-                    Show covering
+                    {t.showCovering}
                   </Label>
                 </div>
               </div>
@@ -1014,7 +1023,7 @@ const BlindGenerator = () => {
 
             <Card className="p-6 bg-card border-border shadow-lg opacity-50 pointer-events-none" style={coveringMaterial === "plywood" ? {} : { opacity: 1, pointerEvents: 'auto' }}>
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                SUPPORT SPACING
+                {t.supportSpacing}
               </h2>
 
               <div className="space-y-6">
@@ -1022,7 +1031,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="supportSpacing" className="text-sm font-mono uppercase tracking-wider">
-                      Spacing (cm)
+                      {t.spacing}
                     </Label>
                     <Input
                       id="supportSpacing"
@@ -1062,7 +1071,7 @@ const BlindGenerator = () => {
                       htmlFor="distributeEvenly"
                       className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                     >
-                      Distribute evenly
+                      {t.distributeEvenly}
                     </Label>
                   </div>
                 )}
@@ -1073,7 +1082,7 @@ const BlindGenerator = () => {
           {/* Canvas */}
           <Card className="p-6 border-border shadow-lg bg-transparent">
             <h2 className="text-xl font-semibold mb-4 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-              PREVIEW
+              {t.preview}
             </h2>
             
             <div className="mb-4 flex items-center gap-6">
@@ -1087,7 +1096,7 @@ const BlindGenerator = () => {
                   htmlFor="showHorizontalSpacers"
                   className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                 >
-                  Show horizontal spacers
+                  {t.showHorizontalSpacers}
                 </Label>
               </div>
             </div>
@@ -1102,25 +1111,25 @@ const BlindGenerator = () => {
             <div className="mt-4 space-y-4">
               <div className="text-sm text-muted-foreground font-mono">
                 <div className="flex justify-between">
-                  <span>SCALE: AUTO</span>
-                  <span>AREA: {((width * height) / 1000000).toFixed(2)}m²</span>
+                  <span>{t.scale}</span>
+                  <span>{t.area}: {((width * height) / 1000000).toFixed(2)}m²</span>
                 </div>
               </div>
               
               <div className="space-y-3">
-                <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">Cut Lists</h3>
+                <h3 className="text-sm font-mono uppercase tracking-wider text-foreground">{t.cutLists}</h3>
                 
                 {/* Board Cut List */}
                 <div className="space-y-2">
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Board Cut List</h4>
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{t.boardCutList}</h4>
                   <div className="border border-border rounded-lg overflow-hidden">
                     <table className="w-full text-sm font-mono">
                       <thead>
                         <tr className="bg-primary/10 border-b border-border">
-                          <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
-                          <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
-                          <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
-                          <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                          <th className="px-4 py-2 text-left text-foreground">{t.height}</th>
+                          <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
+                          <th className="px-4 py-2 text-left text-foreground">{t.depth}</th>
+                          <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1144,15 +1153,15 @@ const BlindGenerator = () => {
                 {/* Plywood Cut List */}
                 {coveringMaterial === "plywood" && (
                   <div className="space-y-2">
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Plywood Cut List</h4>
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{t.plywoodCutList}</h4>
                     <div className="border border-border rounded-lg overflow-hidden">
                       <table className="w-full text-sm font-mono">
                         <thead>
                           <tr className="bg-primary/10 border-b border-border">
-                            <th className="px-4 py-2 text-left text-foreground">Width (cm)</th>
-                            <th className="px-4 py-2 text-left text-foreground">Height (cm)</th>
-                            <th className="px-4 py-2 text-left text-foreground">Depth (cm)</th>
-                            <th className="px-4 py-2 text-left text-foreground">Quantity</th>
+                            <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
+                            <th className="px-4 py-2 text-left text-foreground">{t.height}</th>
+                            <th className="px-4 py-2 text-left text-foreground">{t.depth}</th>
+                            <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1209,7 +1218,7 @@ const BlindGenerator = () => {
           <div className="space-y-6">
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                FRAME DIMENSIONS
+                {t.frameDimensions}
               </h2>
 
               <div className="space-y-6">
@@ -1217,7 +1226,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="width" className="text-sm font-mono uppercase tracking-wider">
-                      Width (cm)
+                      {t.width}
                     </Label>
                     <Input
                       id="width"
@@ -1248,7 +1257,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="height" className="text-sm font-mono uppercase tracking-wider">
-                      Height (cm)
+                      {t.height}
                     </Label>
                     <Input
                       id="height"
@@ -1279,7 +1288,7 @@ const BlindGenerator = () => {
 
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                BOARD DIMENSIONS
+                {t.boardDimensions}
               </h2>
 
               <div className="space-y-6">
@@ -1287,7 +1296,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="slatWidth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Height (cm)
+                      {t.boardHeight}
                     </Label>
                     <Input
                       id="slatWidth"
@@ -1317,7 +1326,7 @@ const BlindGenerator = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="slatDepth" className="text-sm font-mono uppercase tracking-wider">
-                      Board Depth (mm)
+                      {t.boardDepth}
                     </Label>
                     <Input
                       id="slatDepth"
@@ -1348,7 +1357,7 @@ const BlindGenerator = () => {
             {coveringMaterial === "plywood" && (
               <Card className="p-6 bg-card border-border shadow-lg">
                 <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                  PLYWOOD DIMENSIONS
+                  {t.plywoodDimensions}
                 </h2>
 
                 <div className="space-y-6">
@@ -1356,7 +1365,7 @@ const BlindGenerator = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="plywoodThickness" className="text-sm font-mono uppercase tracking-wider">
-                        Thickness (mm)
+                        {t.thickness}
                       </Label>
                       <Input
                         id="plywoodThickness"
