@@ -33,6 +33,7 @@ const BlindGenerator = () => {
   const [coveringMaterial, setCoveringMaterial] = useState<string>("plywood"); // covering material type
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
+  const [distributeHorizontalsEvenly, setDistributeHorizontalsEvenly] = useState(false); // distribute horizontals evenly for fabric
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Bin management state
@@ -832,6 +833,23 @@ const BlindGenerator = () => {
                     <span>64cm</span>
                   </div>
                 </div>
+
+                {/* Distribute Evenly Checkbox - only for fabric */}
+                {coveringMaterial === "fabric" && (
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="distributeEvenly"
+                      checked={distributeHorizontalsEvenly}
+                      onCheckedChange={(checked) => setDistributeHorizontalsEvenly(checked as boolean)}
+                    />
+                    <Label
+                      htmlFor="distributeEvenly"
+                      className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                    >
+                      Distribute evenly
+                    </Label>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
