@@ -139,7 +139,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
-  const [coveringMaterial, setCoveringMaterial] = useState<string>("plywood"); // covering material type
+  const [coveringMaterial, setCoveringMaterial] = useState<"none" | "fabric" | "plywood">("plywood"); // covering material type
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -458,7 +458,9 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       const verticalHeight = frame.slatWidth;
       const horizontalWidth = frame.width - 2 * frame.slatDepth;
       const horizontalHeight = frame.slatWidth;
-      const additionalHorizontals = frame.height > frame.supportSpacing ? Math.floor((frame.height - 2 * frame.slatDepth) / frame.supportSpacing) : 0;
+      const additionalHorizontals = frame.coveringMaterial !== "none" && frame.height > frame.supportSpacing 
+        ? Math.floor((frame.height - 2 * frame.slatDepth) / frame.supportSpacing) 
+        : 0;
       
       const boardTableData = [
         [verticalWidth/10, verticalHeight/10, frame.slatDepth/10, 2 * count],
@@ -567,7 +569,9 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     const horizontalHeight = slatWidth;
     
     // Calculate additional horizontal boards needed based on supportSpacing
-    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    const additionalHorizontals = coveringMaterial !== "none" && height > supportSpacing 
+      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+      : 0;
     
     // Board Cut List
     doc.setFontSize(14);
@@ -673,7 +677,9 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     const scaledDepth = slatDepth * scale;
 
     // Check if click is on any horizontal support
-    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    const additionalHorizontals = coveringMaterial !== "none" && height > supportSpacing 
+      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+      : 0;
     
     // Calculate effective spacing for click detection
     const availableHeight = height - 2 * slatDepth;
@@ -771,7 +777,9 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
     // Draw additional horizontal supports based on supportSpacing or evenly distributed
-    const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    const additionalHorizontals = coveringMaterial !== "none" && height > supportSpacing 
+      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+      : 0;
     
     // Calculate spacing: either even distribution or fixed spacing
     const availableHeight = height - 2 * slatDepth;
@@ -1241,7 +1249,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                           {(() => {
                             const verticalWidth = group.frame.height;
                             const horizontalWidth = group.frame.width - 2 * group.frame.slatDepth;
-                            const additionalHorizontals = group.frame.height > group.frame.supportSpacing 
+                            const additionalHorizontals = group.frame.coveringMaterial !== "none" && group.frame.height > group.frame.supportSpacing 
                               ? Math.floor((group.frame.height - 2 * group.frame.slatDepth) / group.frame.supportSpacing) 
                               : 0;
                             
@@ -1287,11 +1295,12 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                   <Label htmlFor="coveringMaterial" className="text-sm font-mono uppercase tracking-wider">
                     {t.material}
                   </Label>
-                  <Select value={coveringMaterial} onValueChange={setCoveringMaterial}>
+                  <Select value={coveringMaterial} onValueChange={(value) => setCoveringMaterial(value as "none" | "fabric" | "plywood")}>
                     <SelectTrigger id="coveringMaterial" className="w-full">
                       <SelectValue placeholder={t.selectMaterial} />
                     </SelectTrigger>
                     <SelectContent className="bg-card z-50">
+                      <SelectItem value="none">{t.none}</SelectItem>
                       <SelectItem value="fabric">{t.fabric}</SelectItem>
                       <SelectItem value="plywood">{t.plywood}</SelectItem>
                     </SelectContent>
@@ -1487,9 +1496,11 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                           <tr>
                             <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
                             <td className="px-4 py-2 text-foreground">{(() => {
-                              const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+                              const additionalHorizontals = height > supportSpacing 
+                                ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+                                : 0;
                               const availableHeight = height - 2 * slatDepth;
-                              const effectiveSpacing = (coveringMaterial === "fabric" && additionalHorizontals > 0)
+                              const effectiveSpacing = additionalHorizontals > 0
                                 ? availableHeight / (additionalHorizontals + 1)
                                 : supportSpacing;
                               return ((effectiveSpacing - slatDepth)/10).toFixed(1);
