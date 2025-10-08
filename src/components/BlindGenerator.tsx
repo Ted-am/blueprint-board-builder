@@ -619,7 +619,7 @@ const BlindGenerator = () => {
         const prevBaseY = offsetY + scaledHeight - scaledDepth - ((i - 1) * effectiveSpacing * scale);
         const prevAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
         const prevSupportTop = i === 1 ? bottomSupportY : (prevBaseY - prevAdditionalOffset);
-        const startY = i === 1 ? bottomSupportY : prevSupportTop + scaledDepth; // measure from bottom of previous support
+        const startY = i === 1 ? bottomSupportY + scaledDepth : prevSupportTop + scaledDepth; // measure from bottom of previous support
         const endY = currentSupportY; // to top of current support (clear gap)
         
         // Draw vertical line
@@ -670,9 +670,9 @@ const BlindGenerator = () => {
         const lastAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && additionalHorizontals > 1) ? (additionalHorizontals * slatDepth * scale) : 0;
         const lastSupportY = lastBaseY - lastAdditionalOffset;
         const topY = offsetY + scaledDepth;
-        const startY = lastSupportY; // measure from top of last support
+        const startY = lastSupportY + scaledDepth; // measure from bottom of last support
         const endY = topY; // to bottom of top frame
-        const lastSegmentDistance = (endY - startY) / scale;
+        const lastSegmentDistance = effectiveSpacing - slatDepth;
         const arrowX = offsetX + scaledWidth + 30;
         
         // Draw vertical line
