@@ -1279,7 +1279,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
           <div className="space-y-6">
             <Card className="p-6 bg-card border-border shadow-lg">
               <h2 className="text-xl font-semibold mb-6 text-foreground tracking-wide" style={{ textShadow: "var(--glow)" }}>
-                {t.frameCovering}
+                {t.coveringMaterial}
               </h2>
 
               <div className="space-y-6">
@@ -1296,20 +1296,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                       <SelectItem value="plywood">{t.plywood}</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="showCovering"
-                    checked={showCovering}
-                    onCheckedChange={(checked) => setShowCovering(checked as boolean)}
-                  />
-                  <Label
-                    htmlFor="showCovering"
-                    className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-                  >
-                    {t.showCovering}
-                  </Label>
                 </div>
               </div>
             </Card>
@@ -1375,6 +1361,20 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                   className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                 >
                   {t.showHorizontalSpacers}
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="showCovering"
+                  checked={showCovering}
+                  onCheckedChange={(checked) => setShowCovering(checked as boolean)}
+                />
+                <Label
+                  htmlFor="showCovering"
+                  className="text-sm font-mono uppercase tracking-wider cursor-pointer"
+                >
+                  {t.showCovering}
                 </Label>
               </div>
             </div>
