@@ -719,31 +719,52 @@ const BlindGenerator = () => {
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
-                  {bin.map((frame, index) => (
-                    <Card key={index} className="p-4 bg-secondary">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-mono font-semibold text-lg">{frame.name}</h3>
-                        <Button
-                          onClick={() => setBin(bin.filter((_, i) => i !== index))}
-                          variant="ghost"
-                          size="sm"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-sm font-mono">
-                        <div>Width: {frame.width/10}cm</div>
-                        <div>Height: {frame.height/10}cm</div>
-                        <div>Board Width: {frame.slatWidth/10}cm</div>
-                        <div>Board Depth: {(frame.slatDepth/10).toFixed(1)}cm</div>
-                        <div>Support Spacing: {frame.supportSpacing/10}cm</div>
-                        <div>Material: {frame.coveringMaterial}</div>
-                        {frame.coveringMaterial === "plywood" && (
-                          <div>Plywood: {(frame.plywoodThickness/10).toFixed(1)}cm</div>
-                        )}
-                      </div>
-                    </Card>
-                  ))}
+                  {(() => {
+                    // Group identical frames
+                    const groupedFrames = bin.reduce((acc, frame, originalIndex) => {
+                      const key = `${frame.width}-${frame.height}-${frame.slatWidth}-${frame.slatDepth}-${frame.supportSpacing}-${frame.coveringMaterial}-${frame.plywoodThickness}`;
+                      if (!acc[key]) {
+                        acc[key] = { frame, count: 0, indices: [] };
+                      }
+                      acc[key].count++;
+                      acc[key].indices.push(originalIndex);
+                      return acc;
+                    }, {} as Record<string, { frame: typeof bin[0], count: number, indices: number[] }>);
+
+                    return Object.values(groupedFrames).map((group, groupIndex) => (
+                      <Card key={groupIndex} className="p-4 bg-secondary">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-mono font-semibold text-lg">{group.frame.name}</h3>
+                            <span className="px-2 py-1 bg-primary text-primary-foreground rounded-md text-sm font-mono">
+                              x{group.count}
+                            </span>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              // Remove all instances of this grouped frame
+                              setBin(bin.filter((_, i) => !group.indices.includes(i)));
+                            }}
+                            variant="ghost"
+                            size="sm"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm font-mono">
+                          <div>Width: {group.frame.width/10}cm</div>
+                          <div>Height: {group.frame.height/10}cm</div>
+                          <div>Board Width: {group.frame.slatWidth/10}cm</div>
+                          <div>Board Depth: {(group.frame.slatDepth/10).toFixed(1)}cm</div>
+                          <div>Support Spacing: {group.frame.supportSpacing/10}cm</div>
+                          <div>Material: {group.frame.coveringMaterial}</div>
+                          {group.frame.coveringMaterial === "plywood" && (
+                            <div>Plywood: {(group.frame.plywoodThickness/10).toFixed(1)}cm</div>
+                          )}
+                        </div>
+                      </Card>
+                    ));
+                  })()}
                 </div>
               </DialogContent>
             </Dialog>
