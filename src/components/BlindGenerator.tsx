@@ -467,6 +467,11 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         [horizontalWidth/10, horizontalHeight/10, frame.slatDepth/10, (2 + additionalHorizontals) * count],
       ];
       
+      // Add plywood triangles for plywood or fabric covering
+      if ((frame.coveringMaterial === "plywood" || frame.coveringMaterial === "fabric") && additionalHorizontals > 0) {
+        boardTableData.push([frame.slatDepth/10, frame.slatDepth/10, frame.plywoodThickness/10, additionalHorizontals * 2 * count]);
+      }
+      
       autoTable(doc, {
         startY: startY + 40,
         head: [["Height (cm)", "Width (cm)", "Depth (cm)", "Qty"]],
@@ -609,6 +614,11 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       [verticalWidth/10, verticalHeight/10, slatDepth/10, 2],
       [horizontalWidth/10, horizontalHeight/10, slatDepth/10, 2 + additionalHorizontals],
     ];
+    
+    // Add plywood triangles for plywood or fabric covering
+    if ((coveringMaterial === "plywood" || coveringMaterial === "fabric") && additionalHorizontals > 0) {
+      boardTableData.push([slatDepth/10, slatDepth/10, plywoodThickness/10, additionalHorizontals * 2]);
+    }
     
     autoTable(doc, {
       startY: 60,
