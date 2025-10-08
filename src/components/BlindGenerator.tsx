@@ -1461,7 +1461,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                           <tr className="bg-primary/10 border-b border-border">
                             <th className="px-4 py-2 text-left text-foreground">{t.height}</th>
                             <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
-                            <th className="px-4 py-2 text-left text-foreground">{t.depth} (mm)</th>
+                            <th className="px-4 py-2 text-left text-foreground">Depth (mm)</th>
                             <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
                           </tr>
                         </thead>
