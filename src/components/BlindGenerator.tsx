@@ -509,18 +509,14 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       if (frame.coveringMaterial === "plywood") {
         const plywoodTableData: any[] = [];
         
-        if (frame.width < 1220) {
-          const standardPlatesQty = Math.floor(frame.height / 2440);
-          const remainingHeight = frame.height % 2440;
-          
-          if (standardPlatesQty > 0) {
-            plywoodTableData.push([2440/10, frame.width/10, frame.plywoodThickness, standardPlatesQty * count]);
-          }
-          
-          if (remainingHeight > 0) {
-            plywoodTableData.push([remainingHeight/10, frame.width/10, frame.plywoodThickness, 1 * count]);
-          }
+        // Check if frame fits in standard sheet (244cm x 122cm) with rotation
+        const fitsInSheet = (frame.width <= 1220 && frame.height <= 2440) || (frame.width <= 2440 && frame.height <= 1220);
+        
+        if (fitsInSheet) {
+          // Single sheet - frame dimensions
+          plywoodTableData.push([frame.height/10, frame.width/10, frame.plywoodThickness, 1 * count]);
         } else {
+          // Multiple panels based on supportSpacing
           const plywoodWidth = frame.width;
           const plywoodHeight = frame.supportSpacing - frame.slatDepth;
           const plywoodQty = (1 + additionalHorizontals) * count;
@@ -594,22 +590,14 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     if (coveringMaterial === "plywood") {
       const plywoodTableData: any[] = [];
       
-      if (width < 1220) {
-        // Calculate plywood plates based on 2440mm standard height
-        const standardPlatesQty = Math.floor(height / 2440);
-        const remainingHeight = height % 2440;
-        
-        // Add standard plates (Width x 2440mm)
-        if (standardPlatesQty > 0) {
-          plywoodTableData.push([2440/10, width/10, plywoodThickness, standardPlatesQty]);
-        }
-        
-        // Add remaining plate if there's a remainder
-        if (remainingHeight > 0) {
-          plywoodTableData.push([remainingHeight/10, width/10, plywoodThickness, 1]);
-        }
+      // Check if frame fits in standard sheet (244cm x 122cm) with rotation
+      const fitsInSheet = (width <= 1220 && height <= 2440) || (width <= 2440 && height <= 1220);
+      
+      if (fitsInSheet) {
+        // Single sheet - frame dimensions
+        plywoodTableData.push([height/10, width/10, plywoodThickness, 1]);
       } else {
-        // Original logic for width >= 122
+        // Multiple panels based on supportSpacing
         const plywoodWidth = width;
         const plywoodHeight = supportSpacing - slatDepth;
         const plywoodQty = 1 + additionalHorizontals;
@@ -1466,7 +1454,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                           </tr>
                         </thead>
                         <tbody>
-                          {width < 1220 ? (
+                          {((width <= 1220 && height <= 2440) || (width <= 2440 && height <= 1220)) ? (
                             <tr>
                               <td className="px-4 py-2 text-foreground">{height/10}</td>
                               <td className="px-4 py-2 text-foreground">{width/10}</td>
