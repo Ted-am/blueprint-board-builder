@@ -149,13 +149,14 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   const t = getTranslation(language);
   
   // Bin management state
-  const [binName, setBinName] = useState("");
   const [bins, setBins] = useState<Array<{ id: string; name: string; created_at: string }>>([]);
   const [selectedBinId, setSelectedBinId] = useState<string | null>(null);
   const [bin, setBin] = useState<FrameData[]>([]);
   const [showBinDialog, setShowBinDialog] = useState(false);
   const [showNewBinDialog, setShowNewBinDialog] = useState(false);
   const [newBinName, setNewBinName] = useState("");
+  const [showEditBinDialog, setShowEditBinDialog] = useState(false);
+  const [editBinName, setEditBinName] = useState("");
   
   const { id: projectId } = useParams();
 
@@ -259,6 +260,32 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     setSelectedBinId(data.id);
   };
   
+  // Edit bin name
+  const editBin = async () => {
+    if (!editBinName.trim()) {
+      toast({ title: "Please enter a bin name", variant: "destructive" });
+      return;
+    }
+    
+    if (!selectedBinId) return;
+    
+    const { error } = await supabase
+      .from('bins')
+      .update({ name: editBinName.trim() })
+      .eq('id', selectedBinId);
+    
+    if (error) {
+      console.error('Error updating bin:', error);
+      toast({ title: "Error updating bin", variant: "destructive" });
+      return;
+    }
+    
+    toast({ title: "Bin renamed successfully" });
+    setEditBinName("");
+    setShowEditBinDialog(false);
+    await loadBins();
+  };
+  
   // Delete bin
   const deleteBin = async (binId: string) => {
     if (!confirm("Are you sure you want to delete this bin? All frames in it will be deleted.")) {
@@ -302,7 +329,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       setPlywoodThickness(initialData.plywoodThickness || 6);
       setShowHorizontalSpacers(initialData.showHorizontalSpacers !== false);
       setLanguage(initialData.language || 'en');
-      setBinName(initialData.binName || "");
       if (initialData.selectedBinId) {
         setSelectedBinId(initialData.selectedBinId);
       }
@@ -329,12 +355,11 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         plywoodThickness,
         showHorizontalSpacers,
         language,
-        binName,
         selectedBinId,
       });
     }
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, 
-      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, binName, selectedBinId]);
+      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, selectedBinId]);
 
   useEffect(() => {
     if (coveringMaterial === "plywood") {
@@ -362,7 +387,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       .from('bin_frames')
       .insert({
         bin_id: selectedBinId,
-        name: `${binName || 'Frame'}_${height}X${width}`,
+        name: `Frame_${height}X${width}`,
         width,
         height,
         slat_width: slatWidth,
@@ -1092,6 +1117,42 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
               </DialogContent>
             </Dialog>
             
+            <Dialog open={showEditBinDialog} onOpenChange={setShowEditBinDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  className="font-mono uppercase tracking-wider"
+                  variant="outline"
+                  disabled={!selectedBinId}
+                  onClick={() => {
+                    const currentBin = bins.find(b => b.id === selectedBinId);
+                    setEditBinName(currentBin?.name || "");
+                  }}
+                >
+                  Edit Bin
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Bin Name</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="editBinName">Bin Name</Label>
+                    <Input
+                      id="editBinName"
+                      value={editBinName}
+                      onChange={(e) => setEditBinName(e.target.value)}
+                      placeholder="Enter bin name"
+                      className="mt-2"
+                    />
+                  </div>
+                  <Button onClick={editBin} className="w-full">
+                    Save
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
             <Button
               onClick={() => selectedBinId && deleteBin(selectedBinId)}
               className="font-mono uppercase tracking-wider"
@@ -1103,21 +1164,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
             </Button>
           </div>
           
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <Label htmlFor="binName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
-                {t.binName}
-              </Label>
-              <Input
-                id="binName"
-                type="text"
-                value={binName}
-                onChange={(e) => setBinName(e.target.value)}
-                placeholder={t.binNamePlaceholder}
-                className="font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-              />
-            </div>
-            
+          <div className="flex flex-wrap items-end gap-4 mt-4">
             <Button
               onClick={addToBin}
               className="font-mono uppercase tracking-wider"
