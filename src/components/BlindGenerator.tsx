@@ -288,7 +288,10 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   
   // Delete bin
   const deleteBin = async (binId: string) => {
-    if (!confirm("Are you sure you want to delete this bin? All frames in it will be deleted.")) {
+    const binToDelete = bins.find(b => b.id === binId);
+    const binName = binToDelete?.name || "this bin";
+    
+    if (!confirm(`Are you sure you want to delete "${binName}"? All frames in it will be deleted.`)) {
       return;
     }
     
