@@ -1459,19 +1459,28 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                       <table className="w-full text-sm font-mono">
                         <thead>
                           <tr className="bg-primary/10 border-b border-border">
-                            <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
                             <th className="px-4 py-2 text-left text-foreground">{t.height}</th>
-                            <th className="px-4 py-2 text-left text-foreground">{t.depth}</th>
+                            <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
+                            <th className="px-4 py-2 text-left text-foreground">{t.depth} (mm)</th>
                             <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td className="px-4 py-2 text-foreground">{width/10}</td>
-                            <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
-                            <td className="px-4 py-2 text-foreground">{plywoodThickness/10}</td>
-                            <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
-                          </tr>
+                          {width < 1220 ? (
+                            <tr>
+                              <td className="px-4 py-2 text-foreground">{height/10}</td>
+                              <td className="px-4 py-2 text-foreground">{width/10}</td>
+                              <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                              <td className="px-4 py-2 text-foreground">1</td>
+                            </tr>
+                          ) : (
+                            <tr>
+                              <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
+                              <td className="px-4 py-2 text-foreground">{width/10}</td>
+                              <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                              <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
+                            </tr>
+                          )}
                         </tbody>
                       </table>
                     </div>
