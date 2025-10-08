@@ -22,6 +22,103 @@ interface FrameData {
   plywoodThickness: number;
 }
 
+// Calculate optimal cut list from standard board lengths
+const calculateOptimalCutList = (pieces: { length: number; qty: number }[], standardLength = 6000) => {
+  const cuts: { boardLength: number; cuts: number[]; waste: number }[] = [];
+  const allPieces: number[] = [];
+  
+  pieces.forEach(piece => {
+    for (let i = 0; i < piece.qty; i++) {
+      allPieces.push(piece.length);
+    }
+  });
+  
+  // Sort pieces in descending order for better fitting
+  allPieces.sort((a, b) => b - a);
+  
+  while (allPieces.length > 0) {
+    const board: number[] = [];
+    let remainingLength = standardLength;
+    let i = 0;
+    
+    while (i < allPieces.length) {
+      if (allPieces[i] <= remainingLength) {
+        board.push(allPieces[i]);
+        remainingLength -= allPieces[i];
+        allPieces.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+    
+    cuts.push({
+      boardLength: standardLength,
+      cuts: board,
+      waste: remainingLength
+    });
+  }
+  
+  return cuts;
+};
+
+// Draw frame sketch on canvas and return as data URL
+const drawFrameSketch = (frame: FrameData): string => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 400;
+  canvas.height = 300;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return '';
+  
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  const scale = Math.min(
+    (canvas.width - 60) / frame.width,
+    (canvas.height - 60) / frame.height
+  );
+  
+  const scaledWidth = frame.width * scale;
+  const scaledHeight = frame.height * scale;
+  const offsetX = (canvas.width - scaledWidth) / 2;
+  const offsetY = (canvas.height - scaledHeight) / 2;
+  const scaledDepth = frame.slatDepth * scale;
+  
+  // Draw frame
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 2;
+  ctx.fillStyle = '#dbeafe';
+  
+  // Outer rectangle
+  ctx.fillRect(offsetX, offsetY, scaledWidth, scaledHeight);
+  ctx.strokeRect(offsetX, offsetY, scaledWidth, scaledHeight);
+  
+  // Inner rectangle (showing depth)
+  ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledDepth, 
+                 scaledWidth - 2 * scaledDepth, scaledHeight - 2 * scaledDepth);
+  
+  // Draw horizontal supports
+  const additionalHorizontals = frame.height > frame.supportSpacing 
+    ? Math.floor((frame.height - 2 * frame.slatDepth) / frame.supportSpacing) 
+    : 0;
+    
+  ctx.strokeStyle = '#1e40af';
+  for (let i = 1; i <= additionalHorizontals; i++) {
+    const y = offsetY + scaledHeight - scaledDepth - (i * frame.supportSpacing * scale);
+    ctx.beginPath();
+    ctx.moveTo(offsetX + scaledDepth, y);
+    ctx.lineTo(offsetX + scaledWidth - scaledDepth, y);
+    ctx.stroke();
+  }
+  
+  // Add dimensions
+  ctx.fillStyle = '#000000';
+  ctx.font = '12px monospace';
+  ctx.fillText(`${frame.width/10}cm`, offsetX + scaledWidth/2 - 20, offsetY - 10);
+  ctx.fillText(`${frame.height/10}cm`, offsetX - 40, offsetY + scaledHeight/2);
+  
+  return canvas.toDataURL('image/png');
+};
+
 const BlindGenerator = () => {
   const [width, setWidth] = useState(500); // mm
   const [height, setHeight] = useState(2000); // mm
@@ -114,6 +211,16 @@ const BlindGenerator = () => {
       return;
     }
     
+    // Group identical frames
+    const groupedFrames = bin.reduce((acc, frame) => {
+      const key = `${frame.width}-${frame.height}-${frame.slatWidth}-${frame.slatDepth}-${frame.supportSpacing}-${frame.coveringMaterial}-${frame.plywoodThickness}`;
+      if (!acc[key]) {
+        acc[key] = { frame, count: 0 };
+      }
+      acc[key].count++;
+      return acc;
+    }, {} as Record<string, { frame: FrameData, count: number }>);
+    
     const doc = new jsPDF();
     
     doc.setFontSize(18);
@@ -125,12 +232,21 @@ const BlindGenerator = () => {
     
     let startY = 50;
     
-    bin.forEach((frame, index) => {
+    Object.values(groupedFrames).forEach((group, index) => {
+      const frame = group.frame;
+      const count = group.count;
+      
       // Frame header
       doc.setFontSize(14);
-      doc.text(`Frame ${index + 1}: ${frame.name}`, 14, startY);
+      doc.text(`Frame ${index + 1}: ${frame.name} x${count}`, 14, startY);
       doc.setFontSize(10);
       doc.text(`${frame.width/10}cm × ${frame.height/10}cm`, 14, startY + 5);
+      
+      // Add frame sketch
+      const sketchData = drawFrameSketch(frame);
+      if (sketchData) {
+        doc.addImage(sketchData, 'PNG', 140, startY - 10, 60, 45);
+      }
       
       // Board Cut List
       const verticalWidth = frame.height;
@@ -140,18 +256,47 @@ const BlindGenerator = () => {
       const additionalHorizontals = frame.height > frame.supportSpacing ? Math.floor((frame.height - 2 * frame.slatDepth) / frame.supportSpacing) : 0;
       
       const boardTableData = [
-        [verticalWidth/10, verticalHeight/10, frame.slatDepth/10, 2],
-        [horizontalWidth/10, horizontalHeight/10, frame.slatDepth/10, 2 + additionalHorizontals],
+        [verticalWidth/10, verticalHeight/10, frame.slatDepth/10, 2 * count],
+        [horizontalWidth/10, horizontalHeight/10, frame.slatDepth/10, (2 + additionalHorizontals) * count],
       ];
       
       autoTable(doc, {
-        startY: startY + 10,
+        startY: startY + 40,
         head: [["Height (cm)", "Width (cm)", "Depth (cm)", "Qty"]],
         body: boardTableData,
         theme: "grid",
         headStyles: { fillColor: [41, 128, 185] },
         margin: { left: 14 },
       });
+      
+      // Calculate optimal cut list
+      const pieces = [
+        { length: verticalWidth, qty: 2 * count },
+        { length: horizontalWidth, qty: (2 + additionalHorizontals) * count }
+      ];
+      const cutList = calculateOptimalCutList(pieces);
+      
+      doc.setFontSize(12);
+      doc.text("Optimal Cut List (600cm boards):", 14, (doc as any).lastAutoTable.finalY + 10);
+      
+      const cutListData = cutList.map((cut, i) => [
+        `Board ${i + 1}`,
+        cut.cuts.map(c => `${(c/10).toFixed(1)}cm`).join(' + '),
+        `${(cut.waste/10).toFixed(1)}cm`,
+        `${((cut.boardLength - cut.waste)/cut.boardLength * 100).toFixed(1)}%`
+      ]);
+      
+      autoTable(doc, {
+        startY: (doc as any).lastAutoTable.finalY + 15,
+        head: [["Board", "Cuts", "Waste", "Efficiency"]],
+        body: cutListData,
+        theme: "grid",
+        headStyles: { fillColor: [34, 197, 94] },
+        margin: { left: 14 },
+      });
+      
+      doc.setFontSize(10);
+      doc.text(`Total boards needed: ${cutList.length} x 600cm`, 14, (doc as any).lastAutoTable.finalY + 7);
       
       // Plywood or Fabric Cut List
       if (frame.coveringMaterial === "plywood") {
@@ -162,21 +307,21 @@ const BlindGenerator = () => {
           const remainingHeight = frame.height % 2440;
           
           if (standardPlatesQty > 0) {
-            plywoodTableData.push([frame.width/10, 2440/10, frame.plywoodThickness/10, standardPlatesQty]);
+            plywoodTableData.push([frame.width/10, 2440/10, frame.plywoodThickness/10, standardPlatesQty * count]);
           }
           
           if (remainingHeight > 0) {
-            plywoodTableData.push([frame.width/10, remainingHeight/10, frame.plywoodThickness/10, 1]);
+            plywoodTableData.push([frame.width/10, remainingHeight/10, frame.plywoodThickness/10, 1 * count]);
           }
         } else {
           const plywoodWidth = frame.width;
           const plywoodHeight = frame.supportSpacing - frame.slatDepth;
-          const plywoodQty = 1 + additionalHorizontals;
+          const plywoodQty = (1 + additionalHorizontals) * count;
           plywoodTableData.push([plywoodWidth/10, plywoodHeight/10, frame.plywoodThickness/10, plywoodQty]);
         }
         
         autoTable(doc, {
-          startY: (doc as any).lastAutoTable.finalY + 5,
+          startY: (doc as any).lastAutoTable.finalY + 15,
           head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Qty"]],
           body: plywoodTableData,
           theme: "grid",
@@ -188,7 +333,7 @@ const BlindGenerator = () => {
       startY = (doc as any).lastAutoTable.finalY + 15;
       
       // Add new page if needed
-      if (startY > 250 && index < bin.length - 1) {
+      if (startY > 250 && index < Object.values(groupedFrames).length - 1) {
         doc.addPage();
         startY = 20;
       }
@@ -761,6 +906,37 @@ const BlindGenerator = () => {
                           {group.frame.coveringMaterial === "plywood" && (
                             <div>Plywood: {(group.frame.plywoodThickness/10).toFixed(1)}cm</div>
                           )}
+                        </div>
+                        
+                        {/* Uncut Board Requirements */}
+                        <div className="mt-3 pt-3 border-t border-border">
+                          <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Uncut Boards (600cm)</h4>
+                          {(() => {
+                            const verticalWidth = group.frame.height;
+                            const horizontalWidth = group.frame.width - 2 * group.frame.slatDepth;
+                            const additionalHorizontals = group.frame.height > group.frame.supportSpacing 
+                              ? Math.floor((group.frame.height - 2 * group.frame.slatDepth) / group.frame.supportSpacing) 
+                              : 0;
+                            
+                            const pieces = [
+                              { length: verticalWidth, qty: 2 * group.count },
+                              { length: horizontalWidth, qty: (2 + additionalHorizontals) * group.count }
+                            ];
+                            const cutList = calculateOptimalCutList(pieces);
+                            
+                            return (
+                              <div className="text-sm font-mono">
+                                <div className="flex justify-between">
+                                  <span>Total boards:</span>
+                                  <span className="font-semibold">{cutList.length}</span>
+                                </div>
+                                <div className="flex justify-between text-muted-foreground">
+                                  <span>Total length:</span>
+                                  <span>{(cutList.length * 600 / 100).toFixed(1)}m</span>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </Card>
                     ));
