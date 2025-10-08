@@ -608,16 +608,18 @@ const BlindGenerator = () => {
       for (let i = 1; i <= additionalHorizontals; i++) {
         const baseY = offsetY + scaledHeight - scaledDepth - (i * effectiveSpacing * scale);
         const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
-        const currentSupportY = baseY - additionalOffset;
+        const currentSupportY = baseY - additionalOffset; // top of current support
         const arrowX = offsetX + scaledWidth + 30;
         const prevBaseY = offsetY + scaledHeight - scaledDepth - ((i - 1) * effectiveSpacing * scale);
         const prevAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
-        const startY = i === 1 ? bottomSupportY : prevBaseY - prevAdditionalOffset;
+        const prevSupportTop = i === 1 ? bottomSupportY : (prevBaseY - prevAdditionalOffset);
+        const startY = i === 1 ? bottomSupportY : prevSupportTop + scaledDepth; // measure from bottom of previous support
+        const endY = currentSupportY; // to top of current support (clear gap)
         
         // Draw vertical line
         ctx.beginPath();
         ctx.moveTo(arrowX, startY);
-        ctx.lineTo(arrowX, currentSupportY);
+        ctx.lineTo(arrowX, endY);
         ctx.stroke();
         
         // Draw arrows
@@ -625,7 +627,7 @@ const BlindGenerator = () => {
         ctx.setLineDash([]);
         ctx.fillStyle = "hsl(199, 89%, 48%)";
         
-        // Top arrow
+        // Top arrow (near previous element)
         ctx.beginPath();
         ctx.moveTo(arrowX, startY);
         ctx.lineTo(arrowX - arrowSize / 2, startY + arrowSize);
@@ -633,27 +635,28 @@ const BlindGenerator = () => {
         ctx.closePath();
         ctx.fill();
         
-        // Bottom arrow
+        // Bottom arrow (near current support)
         ctx.beginPath();
-        ctx.moveTo(arrowX, currentSupportY);
-        ctx.lineTo(arrowX - arrowSize / 2, currentSupportY - arrowSize);
-        ctx.lineTo(arrowX + arrowSize / 2, currentSupportY - arrowSize);
+        ctx.moveTo(arrowX, endY);
+        ctx.lineTo(arrowX - arrowSize / 2, endY - arrowSize);
+        ctx.lineTo(arrowX + arrowSize / 2, endY - arrowSize);
         ctx.closePath();
         ctx.fill();
         
         ctx.setLineDash([5, 5]);
         
-        // Draw dimension text
+        // Draw dimension text (clear gap between supports)
         ctx.fillStyle = "hsl(0, 0%, 100%)";
         ctx.font = "16px monospace";
         ctx.textAlign = "center";
         ctx.shadowBlur = 15;
         
         ctx.save();
-        ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
+        ctx.translate(arrowX + 25, (startY + endY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${(effectiveSpacing/10).toFixed(1)}cm`, 0, 0);
+        ctx.fillText(`${((effectiveSpacing - slatDepth)/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
+      }
       }
       
       // Draw dimension arrow for the last segment (from last support to top)
