@@ -48,7 +48,9 @@ export const translations = {
     totalBoards: "Total boards needed",
     date: "Date",
     totalFrames: "Total Frames",
-    frame: "Frame"
+    frame: "Frame",
+    description: "Description",
+    plywoodTriangles: "Plywood Triangles"
   },
   ru: {
     title: "ГЕНЕРАТОР ДЕРЕВЯННЫХ ЖАЛЮЗИ",
@@ -97,7 +99,9 @@ export const translations = {
     totalBoards: "Всего досок необходимо",
     date: "Дата",
     totalFrames: "Всего рам",
-    frame: "Рама"
+    frame: "Рама",
+    description: "Описание",
+    plywoodTriangles: "Деревянные уголки"
   },
   he: {
     title: "מחולל תריסי עץ",
@@ -146,7 +150,9 @@ export const translations = {
     totalBoards: "סה״כ לוחות נדרשים",
     date: "תאריך",
     totalFrames: "סה״כ מסגרות",
-    frame: "מסגרת"
+    frame: "מסגרת",
+    description: "תיאור",
+    plywoodTriangles: "משולשי עץ לבוד"
   },
   th: {
     title: "เครื่องสร้างมู่ลี่ไม้",
@@ -195,7 +201,9 @@ export const translations = {
     totalBoards: "จำนวนแผ่นไม้ทั้งหมดที่ต้องการ",
     date: "วันที่",
     totalFrames: "กรอบทั้งหมด",
-    frame: "กรอบ"
+    frame: "กรอบ",
+    description: "รายละเอียด",
+    plywoodTriangles: "สามเหลี่ยมไม้อัด"
   }
 };
 
