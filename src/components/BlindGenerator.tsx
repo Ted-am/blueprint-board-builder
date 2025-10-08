@@ -1679,25 +1679,14 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                       : 0;
                     triangleCount = (1 + additionalHorizontals) * 2;
                   } else if (coveringMaterial === "plywood") {
-                    // For plywood: calculate based on panel divisions
-                    const maxSheetHeight = 2440;
-                    const maxSheetWidth = 1220;
-                    const fitsInSheet = (width <= maxSheetWidth && height <= maxSheetHeight) || 
-                                       (width <= maxSheetHeight && height <= maxSheetWidth);
-                    
-                    if (fitsInSheet) {
-                      // Single sheet: 2 triangles (top and bottom)
-                      triangleCount = 2;
-                    } else if (width <= maxSheetWidth && height > maxSheetHeight) {
-                      // Multiple sheets vertically
-                      const fullSheets = Math.floor(height / maxSheetHeight);
-                      const remainder = height % maxSheetHeight;
-                      triangleCount = (fullSheets + (remainder > 0 ? 1 : 0)) * 2;
-                    } else {
-                      // For other cases, use the panel quantity
-                      const panelQty = 1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0);
-                      triangleCount = panelQty * 2;
-                    }
+                    // For plywood: count horizontal elements (top, bottom, and intermediate supports)
+                    const additionalHorizontals = height > supportSpacing 
+                      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+                      : 0;
+                    // Total horizontal elements = top frame + bottom frame + intermediate supports
+                    const totalHorizontalElements = 2 + additionalHorizontals;
+                    // Each horizontal element needs 2 triangles (left and right)
+                    triangleCount = totalHorizontalElements * 2;
                   }
                   
                   return triangleCount > 0 ? (
