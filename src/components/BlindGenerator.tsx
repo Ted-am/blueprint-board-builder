@@ -139,7 +139,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   const [supportSpacing, setSupportSpacing] = useState(500); // mm spacing between horizontal supports
   const [selectedSupport, setSelectedSupport] = useState<number | null>(null); // index of selected horizontal support (1-based, null = none)
   const [showCovering, setShowCovering] = useState(false); // show frame covering
-  const [coveringMaterial, setCoveringMaterial] = useState<"none" | "fabric" | "plywood">("plywood"); // covering material type
+  const [coveringMaterial, setCoveringMaterial] = useState<"none" | "fabric" | "plywood">("none"); // covering material type
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
   const canvasRef = useRef<HTMLCanvasElement>(null);
