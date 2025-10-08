@@ -176,7 +176,7 @@ const BlindGenerator = () => {
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers, distributeHorizontalsEvenly, coveringMaterial]);
 
   const addToBin = () => {
     if (!binName.trim()) {
