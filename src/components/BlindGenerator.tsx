@@ -1513,38 +1513,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                   </div>
                 </div>
                 
-                {/* Parts (Plywood Triangles) */}
-                {(coveringMaterial === "plywood" || coveringMaterial === "fabric") && (() => {
-                  const additionalHorizontals = height > supportSpacing 
-                    ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
-                    : 0;
-                  return additionalHorizontals > 0 ? (
-                    <div className="space-y-2">
-                      <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Parts</h4>
-                      <div className="border border-border rounded-lg overflow-hidden">
-                        <table className="w-full text-sm font-mono">
-                          <thead>
-                            <tr className="bg-primary/10 border-b border-border">
-                              <th className="px-4 py-2 text-left text-foreground">{t.height}</th>
-                              <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
-                              <th className="px-4 py-2 text-left text-foreground">{t.depth}</th>
-                              <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
-                              <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
-                              <td className="px-4 py-2 text-foreground">{plywoodThickness/10}</td>
-                              <td className="px-4 py-2 text-foreground">{additionalHorizontals * 2}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  ) : null;
-                })()}
-                
                 {/* Plywood Cut List */}
                 {coveringMaterial === "plywood" && (
                   <div className="space-y-2">
@@ -1694,6 +1662,38 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                     </div>
                   </div>
                 )}
+                
+                {/* Parts (Plywood Triangles) */}
+                {(coveringMaterial === "plywood" || coveringMaterial === "fabric") && (() => {
+                  const additionalHorizontals = height > supportSpacing 
+                    ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+                    : 0;
+                  return additionalHorizontals > 0 ? (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Parts</h4>
+                      <div className="border border-border rounded-lg overflow-hidden">
+                        <table className="w-full text-sm font-mono">
+                          <thead>
+                            <tr className="bg-primary/10 border-b border-border">
+                              <th className="px-4 py-2 text-left text-foreground">{t.height}</th>
+                              <th className="px-4 py-2 text-left text-foreground">{t.width}</th>
+                              <th className="px-4 py-2 text-left text-foreground">{t.depth}</th>
+                              <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
+                              <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
+                              <td className="px-4 py-2 text-foreground">{plywoodThickness/10}</td>
+                              <td className="px-4 py-2 text-foreground">{additionalHorizontals * 2}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
               </div>
             </div>
           </Card>
