@@ -407,26 +407,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     await loadBinFrames();
   };
   
-  const clearBin = async () => {
-    if (!selectedBinId) return;
-    
-    if (!confirm(t.areYouSure)) return;
-    
-    const { error } = await supabase
-      .from('bin_frames')
-      .delete()
-      .eq('bin_id', selectedBinId);
-    
-    if (error) {
-      console.error('Error clearing bin:', error);
-      toast({ title: "Error clearing bin", variant: "destructive" });
-      return;
-    }
-    
-    toast({ title: "Bin cleared successfully" });
-    await loadBinFrames();
-  };
-  
   const exportBin = () => {
     if (bin.length === 0) {
       alert(t.binEmpty);
@@ -1300,16 +1280,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                 </div>
               </DialogContent>
             </Dialog>
-            
-            <Button
-              onClick={clearBin}
-              className="font-mono uppercase tracking-wider"
-              variant="destructive"
-              disabled={bin.length === 0}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t.clearBin}
-            </Button>
           </div>
         </Card>
 
