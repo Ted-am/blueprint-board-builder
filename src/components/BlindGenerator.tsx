@@ -1444,7 +1444,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                           <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
                           <td className="px-4 py-2 text-foreground">{slatWidth/10}</td>
                           <td className="px-4 py-2 text-foreground">{slatDepth/10}</td>
-                          <td className="px-4 py-2 text-foreground">{2 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
+                          <td className="px-4 py-2 text-foreground">{2 + (coveringMaterial !== "none" && height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                         </tr>
                       </tbody>
                     </table>
