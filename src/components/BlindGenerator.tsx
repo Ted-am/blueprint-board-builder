@@ -1145,18 +1145,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Bin
             </Button>
-          </div>
-          
-          <div className="flex flex-wrap items-end gap-4 mt-4">
-            <Button
-              onClick={addToBin}
-              className="font-mono uppercase tracking-wider"
-              variant="default"
-              disabled={!selectedBinId}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              {t.addToBin}
-            </Button>
             
             <Dialog open={showBinDialog} onOpenChange={setShowBinDialog}>
               <DialogTrigger asChild>
@@ -1398,6 +1386,20 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
               className="w-full h-auto border border-border rounded bg-transparent"
               onClick={handleCanvasClick}
             />
+            
+            <div className="mt-4 flex justify-center">
+              <Button
+                onClick={addToBin}
+                className="font-mono uppercase tracking-wider"
+                variant="default"
+                disabled={!selectedBinId}
+                size="lg"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {t.addToBin}
+              </Button>
+            </div>
+            
             <div className="mt-4 space-y-4">
               <div className="text-sm text-muted-foreground font-mono">
                 <div className="flex justify-between">
