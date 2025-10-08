@@ -672,7 +672,9 @@ const BlindGenerator = () => {
         const topY = offsetY + scaledDepth;
         const startY = lastSupportY + scaledDepth; // measure from bottom of last support
         const endY = topY; // to bottom of top frame
-        const lastSegmentDistance = effectiveSpacing - slatDepth;
+        const lastSegmentDistance = (distributeHorizontalsEvenly && coveringMaterial === "fabric") 
+          ? effectiveSpacing - slatDepth 
+          : (endY - startY) / scale;
         const arrowX = offsetX + scaledWidth + 30;
         
         // Draw vertical line
