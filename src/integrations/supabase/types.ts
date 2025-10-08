@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      bin_frames: {
+        Row: {
+          bin_id: string
+          covering_material: string
+          created_at: string
+          height: number
+          id: string
+          name: string
+          plywood_thickness: number
+          slat_depth: number
+          slat_width: number
+          support_spacing: number
+          width: number
+        }
+        Insert: {
+          bin_id: string
+          covering_material: string
+          created_at?: string
+          height: number
+          id?: string
+          name: string
+          plywood_thickness: number
+          slat_depth: number
+          slat_width: number
+          support_spacing: number
+          width: number
+        }
+        Update: {
+          bin_id?: string
+          covering_material?: string
+          created_at?: string
+          height?: number
+          id?: string
+          name?: string
+          plywood_thickness?: number
+          slat_depth?: number
+          slat_width?: number
+          support_spacing?: number
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bin_frames_bin_id_fkey"
+            columns: ["bin_id"]
+            isOneToOne: false
+            referencedRelation: "bins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bins: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          project_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          project_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          project_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

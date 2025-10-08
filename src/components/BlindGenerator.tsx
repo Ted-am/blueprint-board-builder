@@ -12,8 +12,12 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Language, getTranslation } from "@/lib/translations";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { useParams } from "react-router-dom";
 
 interface FrameData {
+  id?: string; // Database ID for deleting
   name: string;
   width: number;
   height: number;
@@ -146,11 +150,146 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   
   // Bin management state
   const [binName, setBinName] = useState("");
+  const [bins, setBins] = useState<Array<{ id: string; name: string; created_at: string }>>([]);
+  const [selectedBinId, setSelectedBinId] = useState<string | null>(null);
   const [bin, setBin] = useState<FrameData[]>([]);
   const [showBinDialog, setShowBinDialog] = useState(false);
+  const [showNewBinDialog, setShowNewBinDialog] = useState(false);
+  const [newBinName, setNewBinName] = useState("");
+  
+  const { id: projectId } = useParams();
+
+  // Load bins from database
+  const loadBins = async () => {
+    if (!projectId) return;
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('bins')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading bins:', error);
+      toast({ title: "Error loading bins", variant: "destructive" });
+      return;
+    }
+    
+    setBins(data || []);
+    
+    // Auto-select first bin if none selected
+    if (data && data.length > 0 && !selectedBinId) {
+      setSelectedBinId(data[0].id);
+    }
+  };
+  
+  // Load frames for selected bin
+  const loadBinFrames = async () => {
+    if (!selectedBinId) {
+      setBin([]);
+      return;
+    }
+    
+    const { data, error } = await supabase
+      .from('bin_frames')
+      .select('*')
+      .eq('bin_id', selectedBinId)
+      .order('created_at', { ascending: true });
+    
+    if (error) {
+      console.error('Error loading bin frames:', error);
+      toast({ title: "Error loading frames", variant: "destructive" });
+      return;
+    }
+    
+    // Convert database format to FrameData format
+    const frames: FrameData[] = (data || []).map(frame => ({
+      id: frame.id,
+      name: frame.name,
+      width: frame.width,
+      height: frame.height,
+      slatWidth: frame.slat_width,
+      slatDepth: frame.slat_depth,
+      supportSpacing: frame.support_spacing,
+      coveringMaterial: frame.covering_material,
+      plywoodThickness: frame.plywood_thickness,
+    }));
+    
+    setBin(frames);
+  };
+  
+  // Create new bin
+  const createNewBin = async () => {
+    if (!newBinName.trim()) {
+      toast({ title: "Please enter a bin name", variant: "destructive" });
+      return;
+    }
+    
+    if (!projectId) return;
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Please log in", variant: "destructive" });
+      return;
+    }
+    
+    const { data, error } = await supabase
+      .from('bins')
+      .insert({
+        user_id: user.id,
+        project_id: projectId,
+        name: newBinName.trim(),
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating bin:', error);
+      toast({ title: "Error creating bin", variant: "destructive" });
+      return;
+    }
+    
+    toast({ title: "Bin created successfully" });
+    setNewBinName("");
+    setShowNewBinDialog(false);
+    await loadBins();
+    setSelectedBinId(data.id);
+  };
+  
+  // Delete bin
+  const deleteBin = async (binId: string) => {
+    if (!confirm("Are you sure you want to delete this bin? All frames in it will be deleted.")) {
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('bins')
+      .delete()
+      .eq('id', binId);
+    
+    if (error) {
+      console.error('Error deleting bin:', error);
+      toast({ title: "Error deleting bin", variant: "destructive" });
+      return;
+    }
+    
+    toast({ title: "Bin deleted successfully" });
+    
+    if (selectedBinId === binId) {
+      setSelectedBinId(null);
+    }
+    
+    await loadBins();
+  };
 
   // Load initial data
   useEffect(() => {
+    loadBins();
+    
+    // Load settings from initialData if provided
     if (initialData) {
       setWidth(initialData.width || 500);
       setHeight(initialData.height || 2000);
@@ -164,9 +303,16 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       setShowHorizontalSpacers(initialData.showHorizontalSpacers !== false);
       setLanguage(initialData.language || 'en');
       setBinName(initialData.binName || "");
-      setBin(initialData.bin || []);
+      if (initialData.selectedBinId) {
+        setSelectedBinId(initialData.selectedBinId);
+      }
     }
-  }, []);
+  }, [projectId]);
+  
+  // Load frames when selected bin changes
+  useEffect(() => {
+    loadBinFrames();
+  }, [selectedBinId]);
 
   // Auto-save state changes
   useEffect(() => {
@@ -184,35 +330,11 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         showHorizontalSpacers,
         language,
         binName,
-        bin,
+        selectedBinId,
       });
     }
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, 
-      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, binName, bin]);
-
-  // Update all frame names in bin when binName changes
-  useEffect(() => {
-    if (bin.length > 0 && binName.trim()) {
-      setBin(bin.map(frame => {
-        // Extract height and width from the old name or use frame dimensions
-        const nameParts = frame.name.split('_');
-        if (nameParts.length >= 2) {
-          const dimensionPart = nameParts[nameParts.length - 1];
-          const dimensions = dimensionPart.split('X');
-          const height = dimensions.length >= 1 ? dimensions[0] : frame.height;
-          const width = dimensions.length >= 2 ? dimensions[1] : frame.width;
-          return {
-            ...frame,
-            name: `${binName}_${height}X${width}`
-          };
-        }
-        return {
-          ...frame,
-          name: `${binName}_${frame.height}X${frame.width}`
-        };
-      }));
-    }
-  }, [binName]);
+      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, binName, selectedBinId]);
 
   useEffect(() => {
     if (coveringMaterial === "plywood") {
@@ -230,31 +352,54 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     drawBlinds();
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers, coveringMaterial]);
 
-  const addToBin = () => {
-    if (!binName.trim()) {
-      alert("Please enter a bin name");
+  const addToBin = async () => {
+    if (!selectedBinId) {
+      toast({ title: "Please select or create a bin first", variant: "destructive" });
       return;
     }
     
-    const newFrame: FrameData = {
-      name: `${binName}_${height}X${width}`,
-      width,
-      height,
-      slatWidth,
-      slatDepth,
-      supportSpacing,
-      coveringMaterial,
-      plywoodThickness,
-    };
+    const { error } = await supabase
+      .from('bin_frames')
+      .insert({
+        bin_id: selectedBinId,
+        name: `${binName || 'Frame'}_${height}X${width}`,
+        width,
+        height,
+        slat_width: slatWidth,
+        slat_depth: slatDepth,
+        support_spacing: supportSpacing,
+        covering_material: coveringMaterial,
+        plywood_thickness: plywoodThickness,
+      });
     
-    setBin([...bin, newFrame]);
+    if (error) {
+      console.error('Error adding to bin:', error);
+      toast({ title: "Error adding frame to bin", variant: "destructive" });
+      return;
+    }
+    
+    toast({ title: "Frame added to bin successfully" });
+    await loadBinFrames();
   };
   
-  const clearBin = () => {
-    if (confirm(t.areYouSure)) {
-      setBin([]);
-      setBinName("");
+  const clearBin = async () => {
+    if (!selectedBinId) return;
+    
+    if (!confirm(t.areYouSure)) return;
+    
+    const { error } = await supabase
+      .from('bin_frames')
+      .delete()
+      .eq('bin_id', selectedBinId);
+    
+    if (error) {
+      console.error('Error clearing bin:', error);
+      toast({ title: "Error clearing bin", variant: "destructive" });
+      return;
     }
+    
+    toast({ title: "Bin cleared successfully" });
+    await loadBinFrames();
   };
   
   const exportBin = () => {
@@ -896,6 +1041,68 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
 
         {/* Bin Management */}
         <Card className="p-4 mb-6 bg-card border-border shadow-lg">
+          <div className="flex flex-wrap items-end gap-4 mb-4">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="selectedBin" className="text-sm font-mono uppercase tracking-wider mb-2 block">
+                Select Bin
+              </Label>
+              <Select value={selectedBinId || ""} onValueChange={setSelectedBinId}>
+                <SelectTrigger id="selectedBin" className="w-full">
+                  <SelectValue placeholder="Select a bin" />
+                </SelectTrigger>
+                <SelectContent className="bg-card z-50">
+                  {bins.map((bin) => (
+                    <SelectItem key={bin.id} value={bin.id}>
+                      {bin.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Dialog open={showNewBinDialog} onOpenChange={setShowNewBinDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  className="font-mono uppercase tracking-wider"
+                  variant="outline"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Bin
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Bin</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="newBinName">Bin Name</Label>
+                    <Input
+                      id="newBinName"
+                      value={newBinName}
+                      onChange={(e) => setNewBinName(e.target.value)}
+                      placeholder="Enter bin name"
+                      className="mt-2"
+                    />
+                  </div>
+                  <Button onClick={createNewBin} className="w-full">
+                    Create Bin
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <Button
+              onClick={() => selectedBinId && deleteBin(selectedBinId)}
+              className="font-mono uppercase tracking-wider"
+              variant="destructive"
+              disabled={!selectedBinId}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Bin
+            </Button>
+          </div>
+          
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-[200px]">
               <Label htmlFor="binName" className="text-sm font-mono uppercase tracking-wider mb-2 block">
@@ -915,6 +1122,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
               onClick={addToBin}
               className="font-mono uppercase tracking-wider"
               variant="default"
+              disabled={!selectedBinId}
             >
               <Plus className="mr-2 h-4 w-4" />
               {t.addToBin}
@@ -969,9 +1177,27 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                             </span>
                           </div>
                           <Button
-                            onClick={() => {
-                              // Remove all instances of this grouped frame
-                              setBin(bin.filter((_, i) => !group.indices.includes(i)));
+                            onClick={async () => {
+                              // Delete all instances of this grouped frame from database
+                              const frameIds = group.indices
+                                .map(i => bin[i].id)
+                                .filter((id): id is string => id !== undefined);
+                              
+                              if (frameIds.length === 0) return;
+                              
+                              const { error } = await supabase
+                                .from('bin_frames')
+                                .delete()
+                                .in('id', frameIds);
+                              
+                              if (error) {
+                                console.error('Error deleting frames:', error);
+                                toast({ title: "Error deleting frames", variant: "destructive" });
+                                return;
+                              }
+                              
+                              toast({ title: "Frames deleted successfully" });
+                              await loadBinFrames();
                             }}
                             variant="ghost"
                             size="sm"
