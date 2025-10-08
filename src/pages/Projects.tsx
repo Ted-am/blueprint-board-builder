@@ -163,9 +163,9 @@ const Projects = () => {
           </Button>
         </div>
 
-        <Dialog open={dialogOpen} onOpenChange={(open) => !open && closeDialog()}>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="mb-6">
+            <Button className="mb-6" onClick={() => setDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               New Project
             </Button>
