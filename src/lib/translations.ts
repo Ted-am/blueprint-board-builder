@@ -50,7 +50,9 @@ export const translations = {
     totalFrames: "Total Frames",
     frame: "Frame",
     description: "Description",
-    plywoodTriangles: "Plywood Triangles"
+    plywoodTriangles: "Plywood Triangles",
+    leftConnect: "Left Connect",
+    rightConnect: "Right Connect"
   },
   ru: {
     title: "ГЕНЕРАТОР ДЕРЕВЯННЫХ ЖАЛЮЗИ",
@@ -101,7 +103,9 @@ export const translations = {
     totalFrames: "Всего рам",
     frame: "Рама",
     description: "Описание",
-    plywoodTriangles: "Деревянные уголки"
+    plywoodTriangles: "Деревянные уголки",
+    leftConnect: "Левое соединение",
+    rightConnect: "Правое соединение"
   },
   he: {
     title: "מחולל תריסי עץ",
@@ -152,7 +156,9 @@ export const translations = {
     totalFrames: "סה״כ מסגרות",
     frame: "מסגרת",
     description: "תיאור",
-    plywoodTriangles: "משולשי עץ לבוד"
+    plywoodTriangles: "משולשי עץ לבוד",
+    leftConnect: "חיבור שמאלי",
+    rightConnect: "חיבור ימני"
   },
   th: {
     title: "เครื่องสร้างมู่ลี่ไม้",
@@ -203,7 +209,9 @@ export const translations = {
     totalFrames: "กรอบทั้งหมด",
     frame: "กรอบ",
     description: "รายละเอียด",
-    plywoodTriangles: "สามเหลี่ยมไม้อัด"
+    plywoodTriangles: "สามเหลี่ยมไม้อัด",
+    leftConnect: "เชื่อมต่อซ้าย",
+    rightConnect: "เชื่อมต่อขวา"
   }
 };
 

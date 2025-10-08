@@ -142,6 +142,8 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   const [coveringMaterial, setCoveringMaterial] = useState<"none" | "fabric" | "plywood">("none"); // covering material type
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
+  const [leftConnect, setLeftConnect] = useState(false); // left connect checkbox
+  const [rightConnect, setRightConnect] = useState(false); // right connect checkbox
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Language state
@@ -332,6 +334,8 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       setPlywoodThickness(initialData.plywoodThickness || 6);
       setShowHorizontalSpacers(initialData.showHorizontalSpacers !== false);
       setLanguage(initialData.language || 'en');
+      setLeftConnect(initialData.leftConnect || false);
+      setRightConnect(initialData.rightConnect || false);
       if (initialData.selectedBinId) {
         setSelectedBinId(initialData.selectedBinId);
       }
@@ -359,10 +363,12 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         showHorizontalSpacers,
         language,
         selectedBinId,
+        leftConnect,
+        rightConnect,
       });
     }
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, 
-      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, selectedBinId]);
+      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, selectedBinId, leftConnect, rightConnect]);
 
   useEffect(() => {
     if (coveringMaterial === "plywood") {
@@ -1678,12 +1684,26 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                             <tr className="bg-primary/10 border-b border-border">
                               <th className="px-4 py-2 text-left text-foreground">{t.description}</th>
                               <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
+                              <th className="px-4 py-2 text-center text-foreground">{t.leftConnect}</th>
+                              <th className="px-4 py-2 text-center text-foreground">{t.rightConnect}</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr>
                               <td className="px-4 py-2 text-foreground">{t.plywoodTriangles}</td>
                               <td className="px-4 py-2 text-foreground">{triangleCount}</td>
+                              <td className="px-4 py-2 text-center">
+                                <Checkbox 
+                                  checked={leftConnect}
+                                  onCheckedChange={(checked) => setLeftConnect(checked as boolean)}
+                                />
+                              </td>
+                              <td className="px-4 py-2 text-center">
+                                <Checkbox 
+                                  checked={rightConnect}
+                                  onCheckedChange={(checked) => setRightConnect(checked as boolean)}
+                                />
+                              </td>
                             </tr>
                           </tbody>
                         </table>
