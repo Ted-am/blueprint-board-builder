@@ -1702,33 +1702,39 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                   
                   return triangleCount > 0 ? (
                     <div className="space-y-2">
-                      <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Parts</h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Parts</h4>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Checkbox 
+                              id="left-connect"
+                              checked={leftConnect}
+                              onCheckedChange={(checked) => setLeftConnect(checked as boolean)}
+                            />
+                            <Label htmlFor="left-connect" className="text-xs font-mono cursor-pointer">{t.leftConnect}</Label>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Checkbox 
+                              id="right-connect"
+                              checked={rightConnect}
+                              onCheckedChange={(checked) => setRightConnect(checked as boolean)}
+                            />
+                            <Label htmlFor="right-connect" className="text-xs font-mono cursor-pointer">{t.rightConnect}</Label>
+                          </div>
+                        </div>
+                      </div>
                       <div className="border border-border rounded-lg overflow-hidden">
                         <table className="w-full text-sm font-mono">
                           <thead>
                             <tr className="bg-primary/10 border-b border-border">
                               <th className="px-4 py-2 text-left text-foreground">{t.description}</th>
                               <th className="px-4 py-2 text-left text-foreground">{t.quantity}</th>
-                              <th className="px-4 py-2 text-center text-foreground">{t.leftConnect}</th>
-                              <th className="px-4 py-2 text-center text-foreground">{t.rightConnect}</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr>
                               <td className="px-4 py-2 text-foreground">{t.plywoodTriangles}</td>
                               <td className="px-4 py-2 text-foreground">{triangleCount}</td>
-                              <td className="px-4 py-2 text-center">
-                                <Checkbox 
-                                  checked={leftConnect}
-                                  onCheckedChange={(checked) => setLeftConnect(checked as boolean)}
-                                />
-                              </td>
-                              <td className="px-4 py-2 text-center">
-                                <Checkbox 
-                                  checked={rightConnect}
-                                  onCheckedChange={(checked) => setRightConnect(checked as boolean)}
-                                />
-                              </td>
                             </tr>
                           </tbody>
                         </table>
