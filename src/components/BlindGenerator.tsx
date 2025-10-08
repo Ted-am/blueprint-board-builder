@@ -326,9 +326,9 @@ const BlindGenerator = () => {
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const baseY = offsetY + scaledDepth + (i * supportSpacing * scale);
+      const baseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
       const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * scaledDepth) : 0;
-      const supportY = baseY + additionalOffset;
+      const supportY = baseY - additionalOffset;
       const supportX = offsetX + scaledDepth;
       const supportWidth = scaledWidth - 2 * scaledDepth;
       const supportHeight = scaledDepth;
@@ -414,12 +414,12 @@ const BlindGenerator = () => {
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
-    // Draw additional horizontal supports based on supportSpacing
+    // Draw additional horizontal supports based on supportSpacing (starting from bottom)
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const baseY = offsetY + scaledDepth + (i * supportSpacing * scale);
+      const baseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
       const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
-      const supportY = baseY + additionalOffset;
+      const supportY = baseY - additionalOffset;
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
       
       // Highlight selected support
@@ -446,15 +446,15 @@ const BlindGenerator = () => {
       ctx.strokeStyle = "hsl(199, 89%, 48%)";
       ctx.shadowBlur = 5;
       
-      const prevSupportY = offsetY + scaledDepth;
+      const bottomSupportY = offsetY + scaledHeight - scaledDepth;
       for (let i = 1; i <= additionalHorizontals; i++) {
-        const baseY = offsetY + scaledDepth + (i * supportSpacing * scale);
+        const baseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
         const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
-        const currentSupportY = baseY + additionalOffset;
+        const currentSupportY = baseY - additionalOffset;
         const arrowX = offsetX + scaledWidth + 30;
-        const prevBaseY = offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
+        const prevBaseY = offsetY + scaledHeight - scaledDepth - ((i - 1) * supportSpacing * scale);
         const prevAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
-        const startY = i === 1 ? prevSupportY : prevBaseY + prevAdditionalOffset;
+        const startY = i === 1 ? bottomSupportY : prevBaseY - prevAdditionalOffset;
         
         // Draw vertical line
         ctx.beginPath();
@@ -498,20 +498,20 @@ const BlindGenerator = () => {
         ctx.restore();
       }
       
-      // Draw dimension arrow for the last segment (from last support to bottom)
+      // Draw dimension arrow for the last segment (from last support to top)
       if (additionalHorizontals > 0) {
-        const lastBaseY = offsetY + scaledDepth + (additionalHorizontals * supportSpacing * scale);
+        const lastBaseY = offsetY + scaledHeight - scaledDepth - (additionalHorizontals * supportSpacing * scale);
         const lastAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && additionalHorizontals > 1) ? (additionalHorizontals * slatDepth * scale) : 0;
-        const lastSupportY = lastBaseY + lastAdditionalOffset;
-        const bottomY = offsetY + scaledHeight - scaledDepth;
+        const lastSupportY = lastBaseY - lastAdditionalOffset;
+        const topY = offsetY + scaledDepth;
         const lastSegmentDistance = height - scaledDepth / scale - (additionalHorizontals * supportSpacing) - slatDepth;
         const arrowX = offsetX + scaledWidth + 30;
         
         // Draw vertical line
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
-        ctx.moveTo(arrowX, lastSupportY);
-        ctx.lineTo(arrowX, bottomY);
+        ctx.moveTo(arrowX, topY);
+        ctx.lineTo(arrowX, lastSupportY);
         ctx.stroke();
         
         // Draw arrows
@@ -521,17 +521,17 @@ const BlindGenerator = () => {
         
         // Top arrow
         ctx.beginPath();
-        ctx.moveTo(arrowX, lastSupportY);
-        ctx.lineTo(arrowX - arrowSize / 2, lastSupportY + arrowSize);
-        ctx.lineTo(arrowX + arrowSize / 2, lastSupportY + arrowSize);
+        ctx.moveTo(arrowX, topY);
+        ctx.lineTo(arrowX - arrowSize / 2, topY + arrowSize);
+        ctx.lineTo(arrowX + arrowSize / 2, topY + arrowSize);
         ctx.closePath();
         ctx.fill();
         
         // Bottom arrow
         ctx.beginPath();
-        ctx.moveTo(arrowX, bottomY);
-        ctx.lineTo(arrowX - arrowSize / 2, bottomY - arrowSize);
-        ctx.lineTo(arrowX + arrowSize / 2, bottomY - arrowSize);
+        ctx.moveTo(arrowX, lastSupportY);
+        ctx.lineTo(arrowX - arrowSize / 2, lastSupportY - arrowSize);
+        ctx.lineTo(arrowX + arrowSize / 2, lastSupportY - arrowSize);
         ctx.closePath();
         ctx.fill();
         
@@ -542,7 +542,7 @@ const BlindGenerator = () => {
         ctx.shadowBlur = 15;
         
         ctx.save();
-        ctx.translate(arrowX + 25, (lastSupportY + bottomY) / 2);
+        ctx.translate(arrowX + 25, (topY + lastSupportY) / 2);
         ctx.rotate(-Math.PI / 2);
         ctx.fillText(`${(Math.round(lastSegmentDistance)/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
@@ -561,7 +561,7 @@ const BlindGenerator = () => {
       const frameLeft = offsetX;
       const frameRight = offsetX + scaledWidth;
       
-      // Draw plywood panels between horizontal supports
+      // Draw plywood panels between horizontal supports (starting from bottom)
       for (let i = 0; i <= additionalHorizontals; i++) {
         // Generate random color for each panel
         const hue = Math.floor(Math.random() * 360);
@@ -574,24 +574,27 @@ const BlindGenerator = () => {
         let panelY, panelHeight;
         
         if (i === 0) {
-          // First panel (frame top to first support)
-          panelY = frameTop;
-          const firstSupportY = frameTop + (supportSpacing * scale);
+          // First panel (frame bottom to first support from bottom)
+          const firstSupportY = frameBottom - (supportSpacing * scale);
+          panelY = firstSupportY;
           panelHeight = supportSpacing * scale;
         } else {
           // Calculate previous support position
-          const prevBaseY = offsetY + scaledDepth + ((i - 1) * supportSpacing * scale);
+          const prevBaseY = offsetY + scaledHeight - scaledDepth - ((i - 1) * supportSpacing * scale);
           const prevAdditionalOffset = (width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
-          panelY = prevBaseY + prevAdditionalOffset + scaledDepth;
+          const prevSupportBottom = prevBaseY - prevAdditionalOffset;
           
           if (i === additionalHorizontals) {
-            // Last panel (last support to frame bottom)
-            panelHeight = frameBottom - panelY;
+            // Last panel (last support to frame top)
+            panelHeight = prevSupportBottom - frameTop;
+            panelY = frameTop;
           } else {
             // Middle panels (between supports)
-            const currentBaseY = offsetY + scaledDepth + (i * supportSpacing * scale);
+            const currentBaseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
             const currentAdditionalOffset = (width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
-            panelHeight = (currentBaseY + currentAdditionalOffset) - panelY;
+            const currentSupportBottom = currentBaseY - currentAdditionalOffset + scaledDepth;
+            panelHeight = prevSupportBottom - currentSupportBottom;
+            panelY = currentSupportBottom;
           }
         }
         
