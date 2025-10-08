@@ -470,8 +470,14 @@ const BlindGenerator = () => {
     // Check if click is on any horizontal support
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
     
+    // Calculate effective spacing for click detection
+    const availableHeight = height - 2 * slatDepth;
+    const effectiveSpacing = (distributeHorizontalsEvenly && coveringMaterial === "fabric" && additionalHorizontals > 0)
+      ? availableHeight / (additionalHorizontals + 1)
+      : supportSpacing;
+    
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const baseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
+      const baseY = offsetY + scaledHeight - scaledDepth - (i * effectiveSpacing * scale);
       const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * scaledDepth) : 0;
       const supportY = baseY - additionalOffset;
       const supportX = offsetX + scaledDepth;
@@ -559,10 +565,17 @@ const BlindGenerator = () => {
     ctx.strokeStyle = "hsl(199, 89%, 48%)";
     ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
-    // Draw additional horizontal supports based on supportSpacing (starting from bottom)
+    // Draw additional horizontal supports based on supportSpacing or evenly distributed
     const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+    
+    // Calculate spacing: either even distribution or fixed spacing
+    const availableHeight = height - 2 * slatDepth;
+    const effectiveSpacing = (distributeHorizontalsEvenly && coveringMaterial === "fabric" && additionalHorizontals > 0)
+      ? availableHeight / (additionalHorizontals + 1)
+      : supportSpacing;
+    
     for (let i = 1; i <= additionalHorizontals; i++) {
-      const baseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
+      const baseY = offsetY + scaledHeight - scaledDepth - (i * effectiveSpacing * scale);
       const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
       const supportY = baseY - additionalOffset;
       const supportGradient = ctx.createLinearGradient(offsetX, supportY, offsetX, supportY + scaledDepth);
@@ -593,11 +606,11 @@ const BlindGenerator = () => {
       
       const bottomSupportY = offsetY + scaledHeight - scaledDepth;
       for (let i = 1; i <= additionalHorizontals; i++) {
-        const baseY = offsetY + scaledHeight - scaledDepth - (i * supportSpacing * scale);
+        const baseY = offsetY + scaledHeight - scaledDepth - (i * effectiveSpacing * scale);
         const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * slatDepth * scale) : 0;
         const currentSupportY = baseY - additionalOffset;
         const arrowX = offsetX + scaledWidth + 30;
-        const prevBaseY = offsetY + scaledHeight - scaledDepth - ((i - 1) * supportSpacing * scale);
+        const prevBaseY = offsetY + scaledHeight - scaledDepth - ((i - 1) * effectiveSpacing * scale);
         const prevAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && (i - 1) > 1) ? ((i - 1) * slatDepth * scale) : 0;
         const startY = i === 1 ? bottomSupportY : prevBaseY - prevAdditionalOffset;
         
@@ -639,7 +652,7 @@ const BlindGenerator = () => {
         ctx.save();
         ctx.translate(arrowX + 25, (startY + currentSupportY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${supportSpacing/10}cm`, 0, 0);
+        ctx.fillText(`${(effectiveSpacing/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
       }
       
@@ -1170,7 +1183,14 @@ const BlindGenerator = () => {
                         <tbody>
                           <tr>
                             <td className="px-4 py-2 text-foreground">{(width - 2 * slatDepth)/10}</td>
-                            <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
+                            <td className="px-4 py-2 text-foreground">{(() => {
+                              const additionalHorizontals = height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0;
+                              const availableHeight = height - 2 * slatDepth;
+                              const effectiveSpacing = (distributeHorizontalsEvenly && additionalHorizontals > 0)
+                                ? availableHeight / (additionalHorizontals + 1)
+                                : supportSpacing;
+                              return ((effectiveSpacing - slatDepth)/10).toFixed(1);
+                            })()}</td>
                             <td className="px-4 py-2 text-foreground">-</td>
                             <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
                           </tr>
