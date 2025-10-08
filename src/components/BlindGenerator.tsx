@@ -666,18 +666,20 @@ const BlindGenerator = () => {
       
       // Draw dimension arrow for the last segment (from last support to top)
       if (additionalHorizontals > 0) {
-        const lastBaseY = offsetY + scaledHeight - scaledDepth - (additionalHorizontals * supportSpacing * scale);
+        const lastBaseY = offsetY + scaledHeight - scaledDepth - (additionalHorizontals * effectiveSpacing * scale);
         const lastAdditionalOffset = (coveringMaterial === "plywood" && width > 1220 && additionalHorizontals > 1) ? (additionalHorizontals * slatDepth * scale) : 0;
         const lastSupportY = lastBaseY - lastAdditionalOffset;
         const topY = offsetY + scaledDepth;
-        const lastSegmentDistance = height - scaledDepth / scale - (additionalHorizontals * supportSpacing) - slatDepth;
+        const startY = lastSupportY; // measure from top of last support
+        const endY = topY; // to bottom of top frame
+        const lastSegmentDistance = (endY - startY) / scale;
         const arrowX = offsetX + scaledWidth + 30;
         
         // Draw vertical line
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
-        ctx.moveTo(arrowX, topY);
-        ctx.lineTo(arrowX, lastSupportY);
+        ctx.moveTo(arrowX, startY);
+        ctx.lineTo(arrowX, endY);
         ctx.stroke();
         
         // Draw arrows
@@ -685,19 +687,19 @@ const BlindGenerator = () => {
         ctx.setLineDash([]);
         ctx.fillStyle = "hsl(199, 89%, 48%)";
         
-        // Top arrow
+        // Top arrow (near top frame)
         ctx.beginPath();
-        ctx.moveTo(arrowX, topY);
-        ctx.lineTo(arrowX - arrowSize / 2, topY + arrowSize);
-        ctx.lineTo(arrowX + arrowSize / 2, topY + arrowSize);
+        ctx.moveTo(arrowX, endY);
+        ctx.lineTo(arrowX - arrowSize / 2, endY + arrowSize);
+        ctx.lineTo(arrowX + arrowSize / 2, endY + arrowSize);
         ctx.closePath();
         ctx.fill();
         
-        // Bottom arrow
+        // Bottom arrow (near last support)
         ctx.beginPath();
-        ctx.moveTo(arrowX, lastSupportY);
-        ctx.lineTo(arrowX - arrowSize / 2, lastSupportY - arrowSize);
-        ctx.lineTo(arrowX + arrowSize / 2, lastSupportY - arrowSize);
+        ctx.moveTo(arrowX, startY);
+        ctx.lineTo(arrowX - arrowSize / 2, startY - arrowSize);
+        ctx.lineTo(arrowX + arrowSize / 2, startY - arrowSize);
         ctx.closePath();
         ctx.fill();
         
@@ -708,9 +710,9 @@ const BlindGenerator = () => {
         ctx.shadowBlur = 15;
         
         ctx.save();
-        ctx.translate(arrowX + 25, (topY + lastSupportY) / 2);
+        ctx.translate(arrowX + 25, (startY + endY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${(Math.round(lastSegmentDistance)/10).toFixed(1)}cm`, 0, 0);
+        ctx.fillText(`${(lastSegmentDistance/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
       }
     }
