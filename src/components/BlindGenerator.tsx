@@ -514,22 +514,22 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
           const remainingHeight = frame.height % 2440;
           
           if (standardPlatesQty > 0) {
-            plywoodTableData.push([frame.width/10, 2440/10, frame.plywoodThickness/10, standardPlatesQty * count]);
+            plywoodTableData.push([2440/10, frame.width/10, frame.plywoodThickness/10, standardPlatesQty * count]);
           }
           
           if (remainingHeight > 0) {
-            plywoodTableData.push([frame.width/10, remainingHeight/10, frame.plywoodThickness/10, 1 * count]);
+            plywoodTableData.push([remainingHeight/10, frame.width/10, frame.plywoodThickness/10, 1 * count]);
           }
         } else {
           const plywoodWidth = frame.width;
           const plywoodHeight = frame.supportSpacing - frame.slatDepth;
           const plywoodQty = (1 + additionalHorizontals) * count;
-          plywoodTableData.push([plywoodWidth/10, plywoodHeight/10, frame.plywoodThickness/10, plywoodQty]);
+          plywoodTableData.push([plywoodHeight/10, plywoodWidth/10, frame.plywoodThickness/10, plywoodQty]);
         }
         
         autoTable(doc, {
           startY: (doc as any).lastAutoTable.finalY + 15,
-          head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Qty"]],
+          head: [["Height (cm)", "Width (cm)", "Depth (cm)", "Qty"]],
           body: plywoodTableData,
           theme: "grid",
           headStyles: { fillColor: [76, 175, 80] },
@@ -601,19 +601,19 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         
         // Add standard plates (Width x 2440mm)
         if (standardPlatesQty > 0) {
-          plywoodTableData.push([width/10, 2440/10, plywoodThickness/10, standardPlatesQty]);
+          plywoodTableData.push([2440/10, width/10, plywoodThickness/10, standardPlatesQty]);
         }
         
         // Add remaining plate if there's a remainder
         if (remainingHeight > 0) {
-          plywoodTableData.push([width/10, remainingHeight/10, plywoodThickness/10, 1]);
+          plywoodTableData.push([remainingHeight/10, width/10, plywoodThickness/10, 1]);
         }
       } else {
         // Original logic for width >= 122
         const plywoodWidth = width;
         const plywoodHeight = supportSpacing - slatDepth;
         const plywoodQty = 1 + additionalHorizontals;
-        plywoodTableData.push([plywoodWidth/10, plywoodHeight/10, plywoodThickness/10, plywoodQty]);
+        plywoodTableData.push([plywoodHeight/10, plywoodWidth/10, plywoodThickness/10, plywoodQty]);
       }
       
       const finalY = (doc as any).lastAutoTable.finalY || 60;
@@ -623,7 +623,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       
       autoTable(doc, {
         startY: finalY + 15,
-        head: [["Width (cm)", "Height (cm)", "Depth (cm)", "Quantity"]],
+        head: [["Height (cm)", "Width (cm)", "Depth (cm)", "Quantity"]],
         body: plywoodTableData,
         theme: "grid",
         headStyles: { fillColor: [41, 128, 185] },
