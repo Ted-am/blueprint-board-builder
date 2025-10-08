@@ -142,7 +142,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
   const [coveringMaterial, setCoveringMaterial] = useState<"none" | "fabric" | "plywood">("none"); // covering material type
   const [plywoodThickness, setPlywoodThickness] = useState(6); // mm plywood thickness
   const [showHorizontalSpacers, setShowHorizontalSpacers] = useState(true); // show horizontal spacers
-  const [rotate, setRotate] = useState(false); // rotate frame (swap width/height)
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Language state
@@ -332,7 +331,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       setCoveringMaterial(initialData.coveringMaterial || "plywood");
       setPlywoodThickness(initialData.plywoodThickness || 6);
       setShowHorizontalSpacers(initialData.showHorizontalSpacers !== false);
-      setRotate(initialData.rotate || false);
       setLanguage(initialData.language || 'en');
       if (initialData.selectedBinId) {
         setSelectedBinId(initialData.selectedBinId);
@@ -359,13 +357,12 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         coveringMaterial,
         plywoodThickness,
         showHorizontalSpacers,
-        rotate,
         language,
         selectedBinId,
       });
     }
   }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, 
-      coveringMaterial, plywoodThickness, showHorizontalSpacers, rotate, language, selectedBinId]);
+      coveringMaterial, plywoodThickness, showHorizontalSpacers, language, selectedBinId]);
 
   useEffect(() => {
     if (coveringMaterial === "plywood") {
@@ -381,7 +378,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
 
   useEffect(() => {
     drawBlinds();
-  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers, coveringMaterial, rotate]);
+  }, [width, height, slatWidth, slatDepth, supportSpacing, selectedSupport, showCovering, showHorizontalSpacers, coveringMaterial]);
 
   const addToBin = async () => {
     if (!selectedBinId) {
@@ -668,35 +665,31 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     const clickX = event.clientX - rect.left;
     const clickY = event.clientY - rect.top;
 
-    // Apply rotation: swap width and height if rotate is true
-    const displayWidth = rotate ? height : width;
-    const displayHeight = rotate ? width : height;
-
     // Calculate scale and offsets (same as in drawBlinds)
     const scale = Math.min(
-      (canvas.width - 80) / displayWidth,
-      (canvas.height - 80) / displayHeight
+      (canvas.width - 80) / width,
+      (canvas.height - 80) / height
     );
-    const scaledWidth = displayWidth * scale;
-    const scaledHeight = displayHeight * scale;
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
     const offsetX = (canvas.width - scaledWidth) / 2;
     const offsetY = (canvas.height - scaledHeight) / 2;
     const scaledDepth = slatDepth * scale;
 
     // Check if click is on any horizontal support
-    const additionalHorizontals = coveringMaterial !== "none" && displayHeight > supportSpacing 
-      ? Math.floor((displayHeight - 2 * slatDepth) / supportSpacing) 
+    const additionalHorizontals = coveringMaterial !== "none" && height > supportSpacing 
+      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
       : 0;
     
     // Calculate effective spacing for click detection
-    const availableHeight = displayHeight - 2 * slatDepth;
+    const availableHeight = height - 2 * slatDepth;
     const effectiveSpacing = (coveringMaterial === "fabric" && additionalHorizontals > 0)
       ? availableHeight / (additionalHorizontals + 1)
       : supportSpacing;
     
     for (let i = 1; i <= additionalHorizontals; i++) {
       const baseY = offsetY + scaledHeight - scaledDepth - (i * effectiveSpacing * scale);
-      const additionalOffset = (coveringMaterial === "plywood" && displayWidth > 1220 && i > 1) ? (i * scaledDepth) : 0;
+      const additionalOffset = (coveringMaterial === "plywood" && width > 1220 && i > 1) ? (i * scaledDepth) : 0;
       const supportY = baseY - additionalOffset;
       const supportX = offsetX + scaledDepth;
       const supportWidth = scaledWidth - 2 * scaledDepth;
@@ -729,18 +722,14 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Apply rotation: swap width and height if rotate is true
-    const displayWidth = rotate ? height : width;
-    const displayHeight = rotate ? width : height;
-
     // Calculate scale to fit canvas
     const scale = Math.min(
-      (canvas.width - 80) / displayWidth,
-      (canvas.height - 80) / displayHeight
+      (canvas.width - 80) / width,
+      (canvas.height - 80) / height
     );
-    
-    const scaledWidth = displayWidth * scale;
-    const scaledHeight = displayHeight * scale;
+
+    const scaledWidth = width * scale;
+    const scaledHeight = height * scale;
     const offsetX = (canvas.width - scaledWidth) / 2;
     const offsetY = (canvas.height - scaledHeight) / 2 + 15;
 
@@ -788,8 +777,8 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     ctx.strokeRect(offsetX + scaledDepth, offsetY + scaledHeight - scaledDepth, scaledWidth - 2 * scaledDepth, scaledDepth);
 
     // Draw additional horizontal supports based on supportSpacing or evenly distributed
-    const additionalHorizontals = coveringMaterial !== "none" && displayHeight > supportSpacing 
-      ? Math.floor((displayHeight - 2 * slatDepth) / supportSpacing) 
+    const additionalHorizontals = coveringMaterial !== "none" && height > supportSpacing 
+      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
       : 0;
     
     // Calculate spacing: either even distribution or fixed spacing
@@ -1035,12 +1024,12 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     ctx.font = "16px monospace";
     ctx.textAlign = "center";
     ctx.shadowBlur = 15;
-    ctx.fillText(`${displayWidth/10}cm`, offsetX + scaledWidth / 2, offsetY - 25);
+    ctx.fillText(`${width/10}cm`, offsetX + scaledWidth / 2, offsetY - 25);
     
     ctx.save();
     ctx.translate(offsetX - 30, offsetY + scaledHeight / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText(`${displayHeight/10}cm`, 0, 0);
+    ctx.fillText(`${height/10}cm`, 0, 0);
     ctx.restore();
 
     ctx.shadowBlur = 0;
@@ -1395,20 +1384,6 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                   className="text-sm font-mono uppercase tracking-wider cursor-pointer"
                 >
                   {t.showCovering}
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="rotate"
-                  checked={rotate}
-                  onCheckedChange={(checked) => setRotate(checked as boolean)}
-                />
-                <Label
-                  htmlFor="rotate"
-                  className="text-sm font-mono uppercase tracking-wider cursor-pointer"
-                >
-                  {t.rotate}
                 </Label>
               </div>
             </div>
