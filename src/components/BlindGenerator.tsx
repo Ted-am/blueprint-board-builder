@@ -735,11 +735,11 @@ const BlindGenerator = () => {
                         <div>Width: {frame.width/10}cm</div>
                         <div>Height: {frame.height/10}cm</div>
                         <div>Board Width: {frame.slatWidth/10}cm</div>
-                        <div>Board Depth: {frame.slatDepth/10}cm</div>
+                        <div>Board Depth: {(frame.slatDepth/10).toFixed(1)}cm</div>
                         <div>Support Spacing: {frame.supportSpacing/10}cm</div>
                         <div>Material: {frame.coveringMaterial}</div>
                         {frame.coveringMaterial === "plywood" && (
-                          <div>Plywood: {frame.plywoodThickness}mm</div>
+                          <div>Plywood: {(frame.plywoodThickness/10).toFixed(1)}cm</div>
                         )}
                       </div>
                     </Card>
