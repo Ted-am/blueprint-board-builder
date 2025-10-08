@@ -698,6 +698,9 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         ctx.setLineDash([5, 5]);
         
         // Draw dimension text (clear gap between supports)
+        // Calculate actual distance in pixels and convert to mm
+        const actualDistance = (startY - endY) / scale;
+        
         ctx.fillStyle = "hsl(0, 0%, 100%)";
         ctx.font = "16px monospace";
         ctx.textAlign = "center";
@@ -706,7 +709,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         ctx.save();
         ctx.translate(arrowX + 25, (startY + endY) / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${((effectiveSpacing - slatDepth)/10).toFixed(1)}cm`, 0, 0);
+        ctx.fillText(`${(actualDistance/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
       }
       
@@ -718,9 +721,8 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         const topY = offsetY + scaledDepth;
         const startY = lastSupportY + scaledDepth; // measure from bottom of last support
         const endY = topY; // to bottom of top frame
-        const lastSegmentDistance = (coveringMaterial === "fabric") 
-          ? effectiveSpacing - slatDepth 
-          : (endY - startY) / scale;
+        // Calculate actual distance in pixels and convert to mm
+        const lastSegmentDistance = (startY - endY) / scale;
         const arrowX = offsetX + scaledWidth + 30;
         
         // Draw vertical line
