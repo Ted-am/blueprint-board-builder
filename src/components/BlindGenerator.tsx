@@ -657,7 +657,6 @@ const BlindGenerator = () => {
         ctx.fillText(`${((effectiveSpacing - slatDepth)/10).toFixed(1)}cm`, 0, 0);
         ctx.restore();
       }
-      }
       
       // Draw dimension arrow for the last segment (from last support to top)
       if (additionalHorizontals > 0) {
