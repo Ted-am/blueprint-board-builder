@@ -999,11 +999,12 @@ const BlindGenerator = () => {
                     <Input
                       id="width"
                       type="number"
-                      value={width}
-                      onChange={(e) => setWidth(Number(e.target.value))}
+                      value={width / 10}
+                      onChange={(e) => setWidth(Number(e.target.value) * 10)}
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={500}
-                      max={1600}
+                      min={50}
+                      max={160}
+                      step={0.1}
                     />
                   </div>
                   <Slider
@@ -1029,11 +1030,12 @@ const BlindGenerator = () => {
                     <Input
                       id="height"
                       type="number"
-                      value={height}
-                      onChange={(e) => setHeight(Number(e.target.value))}
+                      value={height / 10}
+                      onChange={(e) => setHeight(Number(e.target.value) * 10)}
                       className="w-24 h-9 text-center font-mono bg-secondary border-primary/30 text-foreground focus:border-primary focus:ring-primary"
-                      min={100}
-                      max={4000}
+                      min={10}
+                      max={400}
+                      step={0.1}
                     />
                   </div>
                   <Slider
