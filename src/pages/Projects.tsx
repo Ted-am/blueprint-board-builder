@@ -9,6 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { toast } from "sonner";
 import { Plus, LogOut, Trash2, Edit } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { z } from "zod";
+
+const projectNameSchema = z.string().trim().min(1, "Project name is required").max(100, "Project name must be less than 100 characters");
 
 interface Project {
   id: string;
@@ -60,6 +63,7 @@ const Projects = () => {
       if (error) throw error;
       setProjects(data || []);
     } catch (error) {
+      console.error("Load projects error:", error);
       toast.error("Failed to load projects");
     } finally {
       setLoading(false);
@@ -67,31 +71,28 @@ const Projects = () => {
   };
 
   const handleCreateOrUpdate = async () => {
-    if (!projectName.trim()) {
-      toast.error("Please enter a project name");
-      return;
-    }
-
     try {
+      const validatedName = projectNameSchema.parse(projectName);
+      
       if (editingProject) {
         const { error } = await supabase
           .from("projects")
-          .update({ name: projectName.trim() })
+          .update({ name: validatedName })
           .eq("id", editingProject.id);
 
         if (error) throw error;
-        toast.success("Project updated");
+        toast.success("Project updated successfully");
       } else {
         const { error } = await supabase
           .from("projects")
           .insert([{ 
-            name: projectName.trim(), 
+            name: validatedName, 
             data: {},
             user_id: user!.id
           }]);
 
         if (error) throw error;
-        toast.success("Project created");
+        toast.success("Project created successfully");
       }
 
       setDialogOpen(false);
@@ -99,7 +100,12 @@ const Projects = () => {
       setEditingProject(null);
       loadProjects();
     } catch (error) {
-      toast.error(editingProject ? "Failed to update project" : "Failed to create project");
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+      } else {
+        console.error("Project operation error:", error);
+        toast.error(editingProject ? "Failed to update project" : "Failed to create project");
+      }
     }
   };
 
@@ -113,9 +119,10 @@ const Projects = () => {
         .eq("id", id);
 
       if (error) throw error;
-      toast.success("Project deleted");
+      toast.success("Project deleted successfully");
       loadProjects();
     } catch (error) {
+      console.error("Delete project error:", error);
       toast.error("Failed to delete project");
     }
   };
