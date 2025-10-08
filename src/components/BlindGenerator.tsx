@@ -1671,23 +1671,14 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                 
                 {/* Parts (Plywood Triangles) */}
                 {(coveringMaterial === "plywood" || coveringMaterial === "fabric") && (() => {
-                  let triangleCount = 0;
-                  
-                  if (coveringMaterial === "fabric") {
-                    const additionalHorizontals = height > supportSpacing 
-                      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
-                      : 0;
-                    triangleCount = (1 + additionalHorizontals) * 2;
-                  } else if (coveringMaterial === "plywood") {
-                    // For plywood: count horizontal elements (top, bottom, and intermediate supports)
-                    const additionalHorizontals = height > supportSpacing 
-                      ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
-                      : 0;
-                    // Total horizontal elements = top frame + bottom frame + intermediate supports
-                    const totalHorizontalElements = 2 + additionalHorizontals;
-                    // Each horizontal element needs 2 triangles (left and right)
-                    triangleCount = totalHorizontalElements * 2;
-                  }
+                  // For both plywood and fabric: count horizontal elements (top, bottom, and intermediate supports)
+                  const additionalHorizontals = height > supportSpacing 
+                    ? Math.floor((height - 2 * slatDepth) / supportSpacing) 
+                    : 0;
+                  // Total horizontal elements = top frame + bottom frame + intermediate supports
+                  const totalHorizontalElements = 2 + additionalHorizontals;
+                  // Each horizontal element needs 2 triangles (left and right)
+                  const triangleCount = totalHorizontalElements * 2;
                   
                   return triangleCount > 0 ? (
                     <div className="space-y-2">
