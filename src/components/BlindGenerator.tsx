@@ -516,11 +516,22 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
           // Single sheet - frame dimensions
           plywoodTableData.push([frame.height/10, frame.width/10, frame.plywoodThickness, 1 * count]);
         } else {
-          // Multiple panels based on supportSpacing
-          const plywoodWidth = frame.width;
-          const plywoodHeight = frame.supportSpacing - frame.slatDepth;
-          const plywoodQty = (1 + additionalHorizontals) * count;
-          plywoodTableData.push([plywoodHeight/10, plywoodWidth/10, frame.plywoodThickness, plywoodQty]);
+          // Multiple panels - each panel must fit in standard sheet
+          const panelHeight = frame.supportSpacing - frame.slatDepth;
+          const panelWidth = frame.width;
+          const panelQty = (1 + additionalHorizontals) * count;
+          
+          // Check if panel fits in sheet, rotate if needed
+          if (panelWidth <= 1220 && panelHeight <= 2440) {
+            plywoodTableData.push([panelHeight/10, panelWidth/10, frame.plywoodThickness, panelQty]);
+          } else if (panelWidth <= 2440 && panelHeight <= 1220) {
+            plywoodTableData.push([panelHeight/10, panelWidth/10, frame.plywoodThickness, panelQty]);
+          } else {
+            // Panel too large - split into sections of max 122cm width
+            const sectionsPerPanel = Math.ceil(panelWidth / 1220);
+            const sectionWidth = Math.min(panelWidth, 1220);
+            plywoodTableData.push([panelHeight/10, sectionWidth/10, frame.plywoodThickness, panelQty * sectionsPerPanel]);
+          }
         }
         
         autoTable(doc, {
@@ -597,11 +608,22 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
         // Single sheet - frame dimensions
         plywoodTableData.push([height/10, width/10, plywoodThickness, 1]);
       } else {
-        // Multiple panels based on supportSpacing
-        const plywoodWidth = width;
-        const plywoodHeight = supportSpacing - slatDepth;
-        const plywoodQty = 1 + additionalHorizontals;
-        plywoodTableData.push([plywoodHeight/10, plywoodWidth/10, plywoodThickness, plywoodQty]);
+        // Multiple panels - each panel must fit in standard sheet
+        const panelHeight = supportSpacing - slatDepth;
+        const panelWidth = width;
+        const panelQty = 1 + additionalHorizontals;
+        
+        // Check if panel fits in sheet, rotate if needed
+        if (panelWidth <= 1220 && panelHeight <= 2440) {
+          plywoodTableData.push([panelHeight/10, panelWidth/10, plywoodThickness, panelQty]);
+        } else if (panelWidth <= 2440 && panelHeight <= 1220) {
+          plywoodTableData.push([panelHeight/10, panelWidth/10, plywoodThickness, panelQty]);
+        } else {
+          // Panel too large - split into sections of max 122cm width
+          const sectionsPerPanel = Math.ceil(panelWidth / 1220);
+          const sectionWidth = Math.min(panelWidth, 1220);
+          plywoodTableData.push([panelHeight/10, sectionWidth/10, plywoodThickness, panelQty * sectionsPerPanel]);
+        }
       }
       
       const finalY = (doc as any).lastAutoTable.finalY || 60;
@@ -1454,21 +1476,55 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
                           </tr>
                         </thead>
                         <tbody>
-                          {((width <= 1220 && height <= 2440) || (width <= 2440 && height <= 1220)) ? (
-                            <tr>
-                              <td className="px-4 py-2 text-foreground">{height/10}</td>
-                              <td className="px-4 py-2 text-foreground">{width/10}</td>
-                              <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
-                              <td className="px-4 py-2 text-foreground">1</td>
-                            </tr>
-                          ) : (
-                            <tr>
-                              <td className="px-4 py-2 text-foreground">{(supportSpacing - slatDepth)/10}</td>
-                              <td className="px-4 py-2 text-foreground">{width/10}</td>
-                              <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
-                              <td className="px-4 py-2 text-foreground">{1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0)}</td>
-                            </tr>
-                          )}
+                          {(() => {
+                            const fitsInSheet = (width <= 1220 && height <= 2440) || (width <= 2440 && height <= 1220);
+                            
+                            if (fitsInSheet) {
+                              return (
+                                <tr>
+                                  <td className="px-4 py-2 text-foreground">{height/10}</td>
+                                  <td className="px-4 py-2 text-foreground">{width/10}</td>
+                                  <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                  <td className="px-4 py-2 text-foreground">1</td>
+                                </tr>
+                              );
+                            } else {
+                              const panelHeight = supportSpacing - slatDepth;
+                              const panelWidth = width;
+                              const panelQty = 1 + (height > supportSpacing ? Math.floor((height - 2 * slatDepth) / supportSpacing) : 0);
+                              
+                              if (panelWidth <= 1220 && panelHeight <= 2440) {
+                                return (
+                                  <tr>
+                                    <td className="px-4 py-2 text-foreground">{panelHeight/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{panelWidth/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                    <td className="px-4 py-2 text-foreground">{panelQty}</td>
+                                  </tr>
+                                );
+                              } else if (panelWidth <= 2440 && panelHeight <= 1220) {
+                                return (
+                                  <tr>
+                                    <td className="px-4 py-2 text-foreground">{panelHeight/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{panelWidth/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                    <td className="px-4 py-2 text-foreground">{panelQty}</td>
+                                  </tr>
+                                );
+                              } else {
+                                const sectionsPerPanel = Math.ceil(panelWidth / 1220);
+                                const sectionWidth = Math.min(panelWidth, 1220);
+                                return (
+                                  <tr>
+                                    <td className="px-4 py-2 text-foreground">{panelHeight/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{sectionWidth/10}</td>
+                                    <td className="px-4 py-2 text-foreground">{plywoodThickness}</td>
+                                    <td className="px-4 py-2 text-foreground">{panelQty * sectionsPerPanel}</td>
+                                  </tr>
+                                );
+                              }
+                            }
+                          })()}
                         </tbody>
                       </table>
                     </div>
