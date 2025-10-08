@@ -702,7 +702,18 @@ const BlindGenerator = () => {
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="font-mono uppercase tracking-wider">Frame Bin</DialogTitle>
+                  <DialogTitle className="font-mono uppercase tracking-wider flex items-center justify-between">
+                    <span>Frame Bin</span>
+                    <Button
+                      onClick={exportBin}
+                      className="font-mono uppercase tracking-wider"
+                      variant="outline"
+                      size="sm"
+                    >
+                      <FileDown className="mr-2 h-4 w-4" />
+                      Export Bin
+                    </Button>
+                  </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   {bin.map((frame, index) => (
@@ -733,16 +744,6 @@ const BlindGenerator = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            
-            <Button
-              onClick={exportBin}
-              className="font-mono uppercase tracking-wider"
-              variant="outline"
-              disabled={bin.length === 0}
-            >
-              <FileDown className="mr-2 h-4 w-4" />
-              Export Bin
-            </Button>
             
             <Button
               onClick={clearBin}
