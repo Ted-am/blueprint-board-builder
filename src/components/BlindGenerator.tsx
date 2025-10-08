@@ -509,7 +509,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
       if (frame.coveringMaterial === "plywood") {
         const plywoodTableData: any[] = [];
         
-        if (frame.width < 122) {
+        if (frame.width < 1220) {
           const standardPlatesQty = Math.floor(frame.height / 2440);
           const remainingHeight = frame.height % 2440;
           
@@ -594,7 +594,7 @@ const BlindGenerator = ({ initialData, onDataChange, onSave }: BlindGeneratorPro
     if (coveringMaterial === "plywood") {
       const plywoodTableData: any[] = [];
       
-      if (width < 122) {
+      if (width < 1220) {
         // Calculate plywood plates based on 2440mm standard height
         const standardPlatesQty = Math.floor(height / 2440);
         const remainingHeight = height % 2440;
